@@ -1,7 +1,65 @@
+<?php 
+$menu 	= $_GET['menu'];
+$action = $_GET['action'] ?? null;
+$tab 	= $_GET['tab'] ?? null;
+
+
+$menus = get_menu_config();
+
+$sidebar = '';
+foreach ($menus as $sideMenu) {
+	$active = '';
+	if(isset($sideMenu['sub'])) {
+		$showSub = '';
+		if($menu == $sideMenu['route']) {
+			$active = 'mm-active';
+			$showSub = 'mm-show';
+		}
+		if(check_session($sideMenu['auth'])) {
+			$sidebar .= '
+				<li class="'.$active.'">
+					<a href="javascript:;" class="has-arrow">
+						<div class="parent-icon">
+							<i class="material-icons-outlined">'.$sideMenu['icon'].'</i>
+						</div>
+						<div class="menu-title">'.$sideMenu['name'].'</div>
+					</a>
+					<ul class="'.$showSub.'">';
+			foreach ($sideMenu['sub'] as $sub) {
+				if(check_session($sub['auth'])) {
+					$sidebar .= '
+						<li>
+							<a href="'.baseUri().'/'.strtolower($sub['route']).'">
+								<i class="material-icons-outlined">arrow_right</i>
+								'.$sub['name'].'
+							</a>
+						</li>';
+				}
+			}
+
+			$sidebar .= '</ul></li>';
+		}
+	} else {
+		if($menu == $sideMenu['route']) $active = 'mm-active';
+		if(check_session($sideMenu['auth'])) {
+			$sidebar .= '<li class="'.$active.'">
+				<a href="'.baseUri().'/'.$sideMenu['route'].'">
+					<div class="parent-icon">
+						<i class="material-icons-outlined">'.$sideMenu['icon'].'</i>
+					</div>
+					<div class="menu-title">'.$sideMenu['name'].'</div>
+				</a>
+			</li>';
+		}
+	}
+}
+
+?>
+
 <aside class="sidebar-wrapper" data-simplebar="true">
 	<div class="sidebar-header">
 		<div class="logo-icon">
-			<img src="assets/images/logo-icon.png" class="logo-img" alt="">
+			<img src="<?=baseUri();?>/assets/images/logo-icon.png" class="logo-img" alt="">
 		</div>
 		<div class="logo-name flex-grow-1">
 			<h5 class="mb-0">Asheeri</h5>
@@ -12,38 +70,8 @@
 	</div>
 	<div class="sidebar-nav">
 		<!--navigation-->
-		<ul class="metismenu" id="sidenav">
-			<li>
-				<a href="javascript:;" class="has-arrow">
-					<div class="parent-icon">
-						<i class="material-icons-outlined">home</i>
-					</div>
-					<div class="menu-title">Dashboard</div>
-				</a>
-				<ul>
-					<li>
-						<a href="index.html">
-							<i class="material-icons-outlined">arrow_right</i>
-							Analysis
-						</a>
-					</li>
-					<li>
-						<a href="index2.html">
-							<i class="material-icons-outlined">arrow_right</i>
-							eCommerce
-						</a>
-					</li>
-				</ul>
-			</li>
-			<li class="menu-label">UI Elements</li>
-			<li>
-				<a href="cards.html">
-					<div class="parent-icon">
-						<i class="material-icons-outlined">inventory_2</i>
-					</div>
-					<div class="menu-title">Cards</div>
-				</a>
-			</li>
+		<ul class="metismenu" id="sidenav">	
+			<?=$sidebar;?>
 		</ul>
 		<!--end navigation-->
 	</div>

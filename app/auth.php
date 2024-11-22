@@ -1,4 +1,8 @@
 <?php 
+require('Model.php');
+require('UserClass.php');
+session_start();
+$userClass = $GLOBALS['userClass'];
 if(isset($_GET['action'])) {
 	if($_GET['action'] == 'login') {
 		$result['msg'] = 'Correct action';
@@ -23,10 +27,6 @@ if(isset($_GET['action'])) {
 	        $status     = $row['status'];
 	        $role     	= $row['role'];
 	        $full_name  = $row['full_name'];
-	        $language  	= $row['language'];
-
-	        $user_actions     = $row['user_actions'];
-	        $user_privileges  = $row['user_privileges'];
 
 	        if (!password_verify($password, $passDB)) {
 	            $result['error'] = true;
@@ -45,7 +45,14 @@ if(isset($_GET['action'])) {
 	        }
 	    }
 
-	    if(set_sessions($username, $user_actions, $user_privileges, $role, $full_name, $user_id, $language)) {
+	    $land = get_landingMenu($user_id);
+
+
+
+
+
+
+	    if(set_sessions($user_id)) {
 	        setLoginInfo($user_id);
 	    } else {
 	        $result['msg']    = ' Couln\'t set sessions.';
@@ -56,85 +63,73 @@ if(isset($_GET['action'])) {
 
 	    $result['msg'] = "Succefully logged in.";
 	    $result['error'] = false;
-	    $result['actions'] = $user_actions;
-	    $result['privilegs'] = strtolower($user_privileges);
+	    $result['land'] = $land;
 	    echo json_encode($result); exit(); 
 
-	} else if($_GET['action'] == 'language') {
-		$user_id = $_SESSION['user_id'];
-		$lang = $_POST['lang'];
-		$stmt = $GLOBALS['conn']->prepare("UPDATE `users` SET `language` =? WHERE `user_id` = ?");
-    	$stmt->bind_param("ss", $lang, $user_id);
-    	if($stmt->execute()) {
-    		$getUser = "SELECT * FROM `users` WHERE `user_id` = '$user_id'";
-		    $userSet = $GLOBALS['conn']->query($getUser);
-		    while($row = $userSet->fetch_assoc()) {
-		        $user_id    = $row['user_id'];
-		        $username   = $row['username'];
-		        $passDB     = $row['password'];
-		        $status     = $row['status'];
-		        $role     	= $row['role'];
-		        $full_name  = $row['full_name'];
-		        $language  	= $row['language'];
-
-		        $user_actions     = $row['user_actions'];
-		        $user_privileges  = $row['user_privileges'];
-		    }
-
-		    if(set_sessions($username, $user_actions, $user_privileges, $role, $full_name, $user_id, $language)) {
-		        setLoginInfo($user_id);
-		    } else {
-		        $result['msg']    = ' Couln\'t set sessions.';
-		        $result['error'] = true;
-		        $result['errType']  = 'sessions';
-		        echo json_encode($result); exit();
-		    }
-    		echo 'changed';
-    	} else {echo $stmt->error;}
-	}
+	} 
 }
 
+function get_landingMenu($user_id) {
+    $menu = null;
+    $permissions = $GLOBALS['userClass']->getPermissions($user_id);
+    // var_dump($permissions);
+    $routes = [
+        'view_dashboard' => './dashboard',
+        'manage_company_info' => './org',
+        'manage_departments' => './departments',
+        'manage_duty_locations' => './locations',
+        'manage_states' => './locations',
+        'manage_company_banks' => './banks',
+        'view_employees' => './employees',
+        'manage_designations' => './designations',
+        'view_payroll' => './payroll',
+        'manage_bonus_allowances' => './bonus',
+        'view_attendance' => './attendance',
+        'manage_timesheets' => './timesheet',
+        'manage_leaves' => './leave',
+        'view_payment_history' => './payments',
+        'manage_users' => './users',
+        'view_reports' => './reports',
+        'manage_settings' => './settings'
+    ];
+    
+    foreach ($permissions as $permission) {
+        if (isset($routes[$permission])) {
+            $menu = $routes[$permission];
+            break;
+        }
+    }
 
-function set_sessions($username, $actions, $privileges, $role = 'user', $fullName = '', $user_id = '', $language = 'en') {
-	$_SESSION['role'] = $role;
-	$_SESSION['myUser'] = $username;
-	$_SESSION['fullName'] = $fullName;
-	$_SESSION['user_id'] = $user_id;
-	$_SESSION['language'] = $language;
-	$_SESSION['isLogged'] = true;
+    return $menu;
+}
 
-	$actions 	= explode(",", $actions);
-	$privileges = explode(",", $privileges);
+function set_sessions($user_id) {
+	$user = $GLOBALS['userClass']->get($user_id);
+	// var_dump($user);
+	$_SESSION['full_name'] 	= $user['full_name'];
+	$_SESSION['emp_id'] 	= $user['emp_id'];
+	$_SESSION['phone'] 		= $user['phone'];
+	$_SESSION['email'] 		= $user['email'];
+	$_SESSION['username'] 	= $user['username'];
+	$_SESSION['myUser'] 	= $user['username'];
+	$_SESSION['role'] 		= $user['role'];
+	$_SESSION['branch_id'] 		= $user['branch_id'];
+	$_SESSION['user_id'] 		= $user['user_id'];
 
-	$_SESSION['dashboard'] = 'off';
-	$_SESSION['books'] = 'off';
-	$_SESSION['customers'] = 'off';
-	$_SESSION['categories'] = 'off';
-	$_SESSION['users'] = 'off';
-	$_SESSION['transactions'] = 'off';
-	$_SESSION['reports'] = 'off';
+	$sysPermissions = $GLOBALS['permissionsClass']->read_all();
+	$userPermissions = $GLOBALS['userClass']->getPermissions($user_id);
 
-	$_SESSION['create'] = 'off';
-	$_SESSION['update'] = 'off';
-	$_SESSION['delete'] = 'off';
-
-	if(in_array(ucfirst("dashboard"), $privileges)) $_SESSION['dashboard'] = 'on';
-	if(in_array(ucfirst("books"), $privileges)) $_SESSION['books'] = 'on';
-	if(in_array(ucfirst("customers"), $privileges)) $_SESSION['customers'] = 'on';
-	if(in_array(ucfirst("categories"), $privileges)) $_SESSION['categories'] = 'on';
-	if(in_array(ucfirst("users"), $privileges)) $_SESSION['users'] = 'on';
-	if(in_array(ucfirst("transactions"), $privileges)) $_SESSION['transactions'] = 'on';
-	if(in_array(ucfirst("reports"), $privileges)) $_SESSION['reports'] = 'on';
-
-	if(in_array("create", $actions)) $_SESSION['create'] = 'on';
-	if(in_array("update", $actions)) $_SESSION['update'] = 'on';
-	if(in_array("delete", $actions)) $_SESSION['delete'] = 'on';
-
-	// $_SESSION['role'] = 'admin';
+	foreach ($sysPermissions as $sysPermission) {
+		if(in_array($sysPermission['name'], $userPermissions)) {
+			$_SESSION[$sysPermission['name']] = 'on';
+		} else {
+			$_SESSION[$sysPermission['name']] = 'off';
+		}
+	}
 	return true;
 }
 
-function reload() {
+function authenticate() {
 	if(!isset($_SESSION['myUser']) || !$_SESSION['myUser']) {
         return false;
     }
@@ -150,9 +145,6 @@ function reload() {
         $status     = $row['status'];
         $role     	= $row['role'];
         $full_name  = $row['full_name'];
-        $language  = $row['language'];
-        $user_actions  		= $row['user_actions'];
-        $user_privileges  	= $row['user_privileges'];
     }
 
     if(strtolower($status) != 'active') {
@@ -160,7 +152,7 @@ function reload() {
     	return;
     }
 
-    set_sessions($username, $user_actions, $user_privileges, $role, $full_name, $user_id, $language); 
+    set_sessions($user_id); 
 }
 
 function setLoginInfo($userID, $logout = false) {
@@ -174,6 +166,32 @@ function setLoginInfo($userID, $logout = false) {
         echo $stmt->error;
     }
 }
+
+
+class Auth extends Users {
+    private $user_id;
+
+    public function __construct() {
+        if (isset($_SESSION['user_id'])) {
+            $this->user_id = $_SESSION['user_id']; // Logged in user
+        } else {
+            throw new Exception("User not logged in");
+        }
+    }
+
+    public function can($permission) {
+        if (!isset($this->user_id)) {
+            return false;
+        }
+
+        // Assuming getPermissions is a method of the User class
+        $permissions = $GLOBALS['userClass']->getPermissions($this->user_id); 
+        return in_array($permission, $permissions);
+    }
+}
+
+$GLOBALS['auth']  = $auth = new Auth();
+
 
 
 ?>

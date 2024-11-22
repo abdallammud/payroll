@@ -13,7 +13,7 @@
 
 
 	<!--start switcher-->
-	<button class="btn btn-grd btn-grd-primary position-fixed bottom-0 end-0 m-3 d-flex align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#staticBackdrop">
+	<button class="btn btn-grd btn-grd-primary position-fixed bottom-0 end-0 m-3 d-flex align-items-center gap-2" style="right: 90% !important; z-index: 9999;" type="button" data-bs-toggle="offcanvas" data-bs-target="#staticBackdrop">
 		<i class="material-icons-outlined">tune</i>Customize
 	</button>
 
@@ -74,25 +74,36 @@
 	</div>
 	<!--start switcher-->
 
+	<?php require('to_json.php'); ?>
 	<!--bootstrap js-->
-	<script src="assets/js/bootstrap.bundle.min.js"></script>
+	<script src="<?=baseUri();?>/assets/js/bootstrap.bundle.min.js"></script>
 
 	<!--plugins-->
-	<script src="assets/js/jquery.min.js"></script>
+	<script src="<?=baseUri();?>/assets/js/jquery.min.js"></script>
 	<!--plugins-->
-	<script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
-	<script src="assets/plugins/metismenu/metisMenu.min.js"></script>
-	<script src="assets/plugins/apexchart/apexcharts.min.js"></script>
-	<script src="assets/plugins/simplebar/js/simplebar.min.js"></script>
-	<script src="assets/plugins/peity/jquery.peity.min.js"></script>
+	<script src="<?=baseUri();?>/assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
+	<script src="<?=baseUri();?>/assets/plugins/sweetalert/sweetalert.min.js"></script>
+	<script src="<?=baseUri();?>/assets/plugins/metismenu/metisMenu.min.js"></script>
+	<!-- <script src="<?=baseUri();?>/assets/plugins/apexchart/apexcharts.min.js"></script> -->
+	<script src="<?=baseUri();?>/assets/plugins/simplebar/js/simplebar.min.js"></script>
+	<script src="<?=baseUri();?>/assets/plugins/peity/jquery.peity.min.js"></script>
+	<script src="<?=baseUri();?>/assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+	<script src="<?=baseUri();?>/assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+	<script src="<?=baseUri();?>/assets/plugins/moment/moment.js"></script>
+	<script src="<?=baseUri();?>/assets/plugins/pikaday/pikaday.js"></script>
 	<script>
-	$(".data-attributes span").peity("donut")
+	// $(".data-attributes span").peity("donut")
 	</script>
-	<script src="assets/js/main.js"></script>
-	<script src="assets/js/dashboard1.js"></script>
+	<script src="<?=baseUri();?>/assets/js/toaster.js"></script>
+	<script src="<?=baseUri();?>/assets/js/main.js"></script>
+	<script src="<?=baseUri();?>/assets/js/utilities.js"></script>
+	<script src="<?=baseUri();?>/assets/js/script.js"></script>
+	<!-- <script src="<?=baseUri();?>/assets/js/dashboard1.js"></script> -->
 	<script>
-	new PerfectScrollbar(".user-list")
+	// new PerfectScrollbar(".user-list")
 	</script>
+
+	<?php load_js_module(); ?>
 
 </body>
 

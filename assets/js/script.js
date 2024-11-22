@@ -1,0 +1,54 @@
+document.addEventListener("DOMContentLoaded", function() {
+	$('.datepicker').each(function(index, element) {
+        new Pikaday({
+            field: element,
+            position: 'bottom left',
+            reposition: false
+        });
+    })
+
+
+
+    // Login User
+
+    $('#userLoginForm').on('submit', (e) => {
+        e.preventDefault();  // Prevent the default form submission
+
+        let form = $(e.target);
+        let username = $(form).find('#inputEmailAddress').val();
+        let password = $(form).find('#inputChoosePassword').val();
+
+        let error = false;
+        error = !validateField(username, `Username is required`, 'inputEmailAddress') || error;
+        error = !validateField(password, `Password is required`, 'inputChoosePassword') || error;
+
+        if (error) return false;
+
+        $.ajax({
+            url: 'app/auth.php?action=login',
+            method: 'POST',
+            data: {
+                username: username,
+                password: password
+            },
+            success: function(response) {
+                console.log(response)
+                // return false;
+                let res = JSON.parse(response)
+                console.log(res)
+                // return false;
+                location.href = res.land
+            },
+            error: function(xhr, status, error) {
+                // Handle error
+                console.log('Login failed: ' + error);
+                // You can display an error message to the user
+            }
+        });
+
+        return false;
+    });
+
+	
+
+});

@@ -8,39 +8,44 @@ class Model {
     public function __construct($table, $primaryKey = 'id') {
         $this->table = $table;
         $this->primaryKey = $primaryKey;
-        $this->db = $GLOBALS['conn']; // Use the existing connection from the global variable
+        $this->db = $GLOBALS['conn']; // Using the existing connection from the global variable
     }
 
     public function read_all($limit = null, $orderBy = null) {
         $query = "SELECT * FROM {$this->table}";
-        
+
         if ($orderBy) {
-            $query .= " ORDER BY $orderBy";
+            $query .= " ORDER BY " . $this->sanitizeField($orderBy);
         }
-        
+
         if ($limit) {
-            $query .= " LIMIT $limit";
+            $query .= " LIMIT ?";
         }
 
         $stmt = $this->db->prepare($query);
+        
+        if ($limit) {
+            $stmt->bind_param('i', $limit); // Assuming limit is always an integer
+        }
+
         $stmt->execute();
         return $this->fetchAll($stmt);
     }
 
     public function read($id) {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE {$this->primaryKey} = ?");
-        $stmt->bind_param('i', $id);
+        $stmt->bind_param('i', $id); // Assuming primary key is always an integer
         $stmt->execute();
         return $this->fetch($stmt);
     }
 
     public function query($sql, $params = [], $types = '') {
         $stmt = $this->db->prepare($sql);
-        
+
         if ($params) {
             $stmt->bind_param($types, ...$params);
         }
-        
+
         $stmt->execute();
         return $this->fetchAll($stmt);
     }
@@ -48,25 +53,41 @@ class Model {
     public function create($data) {
         $columns = implode(", ", array_keys($data));
         $placeholders = str_repeat('?,', count($data) - 1) . '?';
+        $types = $this->determineTypes($data);
+
+        // Prepare the SQL statement
         $stmt = $this->db->prepare("INSERT INTO {$this->table} ($columns) VALUES ($placeholders)");
-        $stmt->bind_param(str_repeat('s', count($data)), ...array_values($data)); // Assuming all values are strings
-        return $stmt->execute();
+        
+        if ($stmt === false) {
+            // Handle the case where the statement couldn't be prepared
+            throw new Exception("Error preparing statement: " . $this->db->error);
+        }
+
+        // Bind the parameters
+        $stmt->bind_param($types, ...array_values($data));
+
+        // Execute the query and check for success
+        if (!$stmt->execute()) {
+            // Handle execution error
+            throw new Exception("Error executing statement: " . $stmt->error);
+        }
+
+        // Return the last inserted ID
+        return $this->db->insert_id;
     }
 
     public function update($id, $data) {
         $set = "";
-        $types = '';
         $values = [];
 
         foreach ($data as $key => $value) {
             $set .= "$key = ?, ";
-            $types .= 's'; // Assuming all values are strings
             $values[] = $value;
         }
-        
+
         $set = rtrim($set, ', ');
-        $values[] = $id;
-        $types .= 'i'; // Assuming ID is an integer
+        $values[] = $id; // Add the ID as the last parameter
+        $types = $this->determineTypes($data) . 'i'; // Assume ID is an integer
 
         $stmt = $this->db->prepare("UPDATE {$this->table} SET $set WHERE {$this->primaryKey} = ?");
         $stmt->bind_param($types, ...$values);
@@ -75,22 +96,22 @@ class Model {
 
     public function delete($id) {
         $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE {$this->primaryKey} = ?");
-        $stmt->bind_param('i', $id);
+        $stmt->bind_param('i', $id); // Assuming primary key is always an integer
         return $stmt->execute();
     }
 
     public function where($conditions, $params = [], $types = '') {
-        $conditionString = implode(" AND ", array_map(function($key) {
+        $conditionString = implode(" AND ", array_map(function ($key) {
             return "$key = ?";
         }, array_keys($conditions)));
 
         $sql = "SELECT * FROM {$this->table} WHERE $conditionString";
         $stmt = $this->db->prepare($sql);
-        
+
         if ($params) {
             $stmt->bind_param($types, ...$params);
         }
-        
+
         $stmt->execute();
         return $this->fetchAll($stmt);
     }
@@ -104,4 +125,27 @@ class Model {
         $result = $stmt->get_result();
         return $result->fetch_assoc();
     }
+
+    // Helper function to determine the parameter types for bind_param
+    protected function determineTypes($data) {
+        $types = '';
+        foreach ($data as $value) {
+            if (is_int($value)) {
+                $types .= 'i';
+            } elseif (is_float($value)) {
+                $types .= 'd';
+            } elseif (is_string($value)) {
+                $types .= 's';
+            } else {
+                $types .= 'b'; // For blob or unknown types
+            }
+        }
+        return $types;
+    }
+
+    // Sanitize fields like table names or column names to prevent SQL injection
+    protected function sanitizeField($field) {
+        return preg_replace('/[^a-zA-Z0-9_]/', '', $field); // Allow only alphanumeric characters and underscores
+    }
 }
+
