@@ -15,6 +15,9 @@ if(isset($_GET['action'])) {
 				        'contact_email' => $_POST['emails']
 				    );
 
+				    check_exists('company', ['name' => $_POST['name']]);
+				    check_auth('manage_company_info');
+
 				    // Call the create method
 				    $result['id'] = $companyClass->create($data);
 
@@ -45,6 +48,9 @@ if(isset($_GET['action'])) {
 				        'contact_phone' => $_POST['phones'], 
 				        'contact_email' => $_POST['emails']
 				    );
+
+				    check_exists('branches', ['name' => $_POST['name']]);
+				    check_auth('manage_departments');
 
 				    // Call the create method
 				    $result['id'] = $branchClass->create($data);
@@ -86,6 +92,9 @@ if(isset($_GET['action'])) {
 				        'contact_email' => $_POST['emails']
 				    );
 
+				    check_exists('company', ['name' => $_POST['name']], ['id' => $_POST['id']]);
+				    check_auth('manage_company_info');
+
 				    // Call the create method
 				    $updated = $companyClass->update($_POST['id'], $data);
 
@@ -117,6 +126,9 @@ if(isset($_GET['action'])) {
 				        'contact_phone' => $_POST['phones'], 
 				        'contact_email' => $_POST['emails']
 				    );
+
+				    check_exists('branches', ['name' => $_POST['name']], ['id' => $_POST['id']]);
+				    check_auth('manage_departments');
 
 				    // Call the create method
 				    $updated = $branchClass->update($_POST['id'], $data);
@@ -271,6 +283,7 @@ if(isset($_GET['action'])) {
 			if ($_GET['endpoint'] === 'company') {
 				try {
 				    // Delete company
+				    check_auth('manage_company_info');
 				    $deleted = $companyClass->delete($_POST['id']);
 
 				    // Company deleted
@@ -294,6 +307,7 @@ if(isset($_GET['action'])) {
 			} else if ($_GET['endpoint'] === 'branch') {
 				try {
 				    // Delete branchClass
+				    check_auth('manage_departments');
 				    $deleted = $branchClass->delete($_POST['id']);
 
 				    // Company deleted

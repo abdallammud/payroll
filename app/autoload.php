@@ -63,19 +63,6 @@ function handle_action($actionConfig, $folder) {
     }
 }
 
-function check_session($authKey) {
-    if (is_array($authKey)) {
-        foreach ($authKey as $key) {
-            if (isset($_SESSION[$key]) && $_SESSION[$key] === 'on') {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    return isset($_SESSION[$authKey]) && $_SESSION[$authKey] === 'on';
-}
-
 function load_file($filePath) {
     if (file_exists($filePath)) {
         require $filePath;

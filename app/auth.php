@@ -149,10 +149,12 @@ function authenticate() {
 
     if(strtolower($status) != 'active') {
     	$_SESSION['isLogged'] = false;
-    	return;
+    	return false;
     }
 
     set_sessions($user_id); 
+
+    return true;
 }
 
 function setLoginInfo($userID, $logout = false) {
@@ -167,30 +169,29 @@ function setLoginInfo($userID, $logout = false) {
     }
 }
 
-
-class Auth extends Users {
-    private $user_id;
-
-    public function __construct() {
-        if (isset($_SESSION['user_id'])) {
-            $this->user_id = $_SESSION['user_id']; // Logged in user
-        } else {
-            throw new Exception("User not logged in");
+function check_session($authKey) {
+    if (is_array($authKey)) {
+        foreach ($authKey as $key) {
+            if (isset($_SESSION[$key]) && $_SESSION[$key] === 'on') {
+                return true;
+            }
         }
+        return false;
     }
 
-    public function can($permission) {
-        if (!isset($this->user_id)) {
-            return false;
-        }
-
-        // Assuming getPermissions is a method of the User class
-        $permissions = $GLOBALS['userClass']->getPermissions($this->user_id); 
-        return in_array($permission, $permissions);
-    }
+    return isset($_SESSION[$authKey]) && $_SESSION[$authKey] === 'on';
 }
 
-$GLOBALS['auth']  = $auth = new Auth();
+function check_auth($authKey, $msg = "You are not authorized to perform this action.") {
+	if(!check_session($authKey)) {
+		$result = [];
+		$result['error'] = true;
+		$result['msg'] = $msg;
+		echo json_encode($result);
+		exit();
+	}
+	return true;
+}
 
 
 

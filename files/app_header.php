@@ -1,7 +1,9 @@
 <?php 
 require('./app/init.php');
-
-authenticate();
+if (!authenticate()) {
+    header("Location: ./login");
+    exit; // Important to exit to prevent further execution
+}
 ?>
 <!doctype html>
 <html lang="en" data-bs-theme="">

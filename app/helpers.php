@@ -45,4 +45,48 @@ function get_data($table, array $fields) {
     return false; // Return false if no records are found or if an error occurs
 }
 
+function check_exists($table, $columns, $not = array()) {
+    // Ensure the connection variable is set
+    if (!isset($GLOBALS['conn'])) {
+        echo json_encode(['error' => true, 'msg' => 'Database connection not established']);
+        exit();
+    }
+
+    $conn = $GLOBALS['conn'];
+
+    // Build the query
+    $query = "SELECT * FROM $table WHERE ";
+    $conditions = [];
+    foreach ($columns as $column => $value) {
+        $conditions[] = "$column = '$value'";
+    }
+    $query .= implode(' AND ', $conditions);
+
+    if(count($not) > 0) {
+        $query .= " AND ";
+        $conditions = [];
+        foreach ($not as $column => $value) {
+            $conditions[] = "$column <> '$value'";
+        }
+        $query .= implode(' AND ', $conditions);
+    }
+
+    // Execute the query
+    $result = mysqli_query($conn, $query);
+
+    if ($result) {
+        if (mysqli_num_rows($result) > 0) {
+            echo json_encode(['error' => true, 'msg' => 'Record already exists']);
+            exit();
+        } else {
+            return true;
+        }
+    } else {
+        echo json_encode(['error' => true, 'msg' => 'Database query error: ' . mysqli_error($conn)]);
+        exit();
+    }
+
+    return true;
+}
+
 ?>
