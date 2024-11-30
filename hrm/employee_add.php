@@ -30,38 +30,45 @@
                         <div class="col col-xs-12 col-md-6 col-lg-5">
                             <div class="form-group">
                                 <label class="label required" for="employeeName">Employee Name</label>
-                                <input type="text"  class="form-control " id="employeeName" name="employeeName">
+                                <input type="text"  class="form-control validate" data-msg="Employee full name is required" id="employeeName" name="employeeName">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
                                 <label class="label required" for="employeePhone">Phone Number</label>
-                                <input type="text"  class="form-control " id="employeePhone" name="employeePhone">
+                                <input type="text"  class="form-control validate" data-msg="Phone number is required" id="employeePhone" name="employeePhone">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-4">
                             <div class="form-group">
                                 <label class="label required" for="employeeEmail">Email</label>
-                                <input type="text"  class="form-control " id="employeeEmail" name="employeeEmail">
+                                <input type="email"  class="form-control validate" id="employeeEmail" name="employeeEmail" data-msg="Email is rquired">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col col-xs-12 col-md-6 col-lg-3">
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
-                                <label class="label required" for="nationalID">ID Number</label>
-                                <input type="text" placeholder="National ID"  class="form-control " id="nationalID" name="nationalID">
+                                <label class="label" for="staffNo">Staff Number</label>
+                                <input type="text" value="<?=sys_setting('staff_prefix');?>"  class="form-control " id="staffNo" name="staffNo">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
-                                <label class="label required" for="gender">Gender Number</label>
-                                <select  class="form-control " id="gender" name="gender">
+                                <label class="label" for="nationalID">ID Number</label>
+                                <input type="text" placeholder="National ID"  class="form-control " id="nationalID" name="nationalID">
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label required" for="gender">Gender </label>
+                                <select  class="form-control validate" id="gender" name="gender">
                                 	<option value="">- Select</option>
                                 	<option value="Male">Male</option>
                                 	<option value="Female">Female</option>
@@ -69,70 +76,66 @@
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-3">
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
-                                <label class="label required" for="dob">Date Of Birth</label>
+                                <label class="label " for="dob">Date Of Birth</label>
                                 <input type="text"  class="form-control cursor datepicker" readonly id="dob" value="<?php echo date('Y-m-d', strtotime("-18 years")); ?>" name="dob">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
-                                <label class="label required" for="address">Address</label>
+                                <label class="label " for="address">Address</label>
                                 <input type="text"  class="form-control " id="address" name="address">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col col-xs-12 col-md-6 col-lg-4">
+                        <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
-                                <label class="label required" for="country">Country</label>
-                                <select  name="country" class="form-control" id="country">
+                                <label class="label required" for="state">State</label>
+                                <select  name="state" class="form-control" id="state">
                                 	<option value="">- Select </option>
                                 	<?php 
-									$countries = $GLOBALS['countryClass']->read_all();
-
-									foreach ($countries as $country) {
-										echo '<option value="'.$country['country_id'].'"';
-										if($country['is_default'] == 'Yes') echo 'selected="selected"';
-										echo '>'.$country['country_name'].'</option>';
-									}
-
+									select_active('states');
                                 	?>
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
+                        
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
-                                <label class="label required" for="state">State</label>
-                                <input type="text"  class="form-control " id="state" name="state">
-                                <span class="form-error text-danger">This is error</span>
-                            </div>
-                        </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-3">
-                            <div class="form-group">
-                                <label class="label required" for="city">City</label>
+                                <label class="label " for="city">City</label>
                                 <input type="text"  class="form-control " id="city" name="city">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-2">
+
+                        <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
-                                <label class="label required" for="postal-code">Postal Code</label>
-                                <input type="text"  class="form-control "  id="postal-code" name="postal-code">
+                                <label class="label " for="bankName">Payment Through</label>
+                                <input type="text"  class="form-control " id="bankName" name="bankName" placeholder="Bank name">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
+                        <div class="col col-xs-12 col-md-6 col-lg-3">
+                            <div class="form-group">
+                               <label class="label ">&nbsp;</label>
+                                <input type="text"  class="form-control " id="accountNo" name="accountNo" placeholder="Account number">
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                       
                     </div>
 
                     <p class="bold smt-20" style="margin-bottom: 0px;">Contract Information</p>
                     <div class="row">
                     	<div class="col col-xs-12 col-md-6 col-lg-4">
                             <div class="form-group">
-                                <label class="label required" for="jobTitle">Job Title</label>
-                                <input type="text"  class="form-control " id="jobTitle" name="jobTitle">
+                                <label class="label required" for="position">Position</label>
+                                <input type="text"  class="form-control " id="position" name="position">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
@@ -142,32 +145,79 @@
                                 <select  name="employeeDep" class="form-control" id="employeeDep">
                                 	<option value="">- Select <?=$GLOBALS['branch_keyword']['sing'];?></option>
                                 	<?php 
-                                	$sql = "SELECT * FROM `branches` WHERE `status` = ?";
-									$params = ['active'];  
-									$types = 's'; 
-									$activeBranches = $GLOBALS['branchClass']->query($sql, $params, $types);
-
-									foreach ($activeBranches as $branch) {
-										echo '<option value="'.$branch['id'].'">'.$branch['name'].'</option>';
-									}
-
+                                	select_active('branches');
                                 	?>
+                                </select>
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                        <div class="col col-xs-12 col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label class="label required" for="dutyStation">Duty Station/Health facility</label>
+                                <select  name="dutyStation" class="form-control" id="dutyStation">
+                                    <option value="">- Select </option>
+                                    <?php 
+                                    select_active('locations');
+                                    ?>
+                                </select>
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label required" for="contractType">Contract Type</label>
+                                <select  name="contractType" class="form-control" id="contractType">
+                                	<option value="">- Select </option>
+                                	<?=select_active('contract_types');?>
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
-                                <label class="label required" for="JobType">Job Type</label>
-                                <select  name="JobType" class="form-control" id="JobType">
-                                	<option value="">- Select </option>
-                                	<option value="Full-time">Full-time</option>
-                                	<option value="Part-time">Part-time</option>
-                                	<option value="Contract">Contract</option>
+                                <label class="label " for="mohContract">MoH Contract</label>
+                                <select  name="mohContract" class="form-control" id="mohContract">
+                                    <option value="No">No </option>
+                                    <option value="Yes">Yes </option>
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label " for="grade">Grade + Step</label>
+                                 <input type="text"  name="grade" class="form-control" id="grade" />
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label required" for="employeeSalary">Base Salary</label>
+                                <input type="text" class="form-control " id="employeeSalary" onkeypress="return isNumberKey(event)" name="employeeSalary">
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label " for="budgetCode">Budget code</label>
+                                 <input type="text"  name="budgetCode" class="form-control" id="budgetCode" />
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label " for="taxExempt">Tax exempt</label>
+                                <select  name="taxExempt" class="form-control" id="taxExempt">
+                                    <option value="No">No </option>
+                                    <option value="Yes">Yes </option>
+                                </select>
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
                                 <label class="label required" for="hireDate">Hire Date</label>
@@ -175,74 +225,83 @@
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label required" for="hireDate">Current contract start</label>
+                                <input type="text"  class="form-control cursor datepicker" readonly value="<?php echo date('Y-m-d'); ?>" id="hireDate" name="hireDate">
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label required" for="hireDate">Current contract end</label>
+                                <input type="text"  class="form-control cursor datepicker" readonly value="<?php echo date('Y-m-d'); ?>" id="hireDate" name="hireDate">
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label " for="grade">Seniority</label>
+                                 <input type="text"  name="grade" class="form-control" id="grade" />
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label " for="grade">Working days/week</label>
+                                 <input type="text"  name="grade" class="form-control" id="grade" />
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label " for="grade">Working hours/day</label>
+                                 <input type="text"  name="grade" class="form-control" id="grade" />
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
                         
                         
                     </div>
 
-                    <div class="row">
-                        <div class="col col-xs-12 col-md-6 col-lg-3">
-                            <div class="form-group">
-                                <label class="label required" for="employeeSalary">Base Salary</label>
-                                <input type="text" class="form-control " id="employeeSalary" onkeypress="return isNumberKey(event)" name="employeeSalary">
-                                <span class="form-error text-danger">This is error</span>
-                            </div>
-                        </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-3">
-                            <div class="form-group">
-                                <label class="label required" for="bonus">Bonus</label>
-                                <input type="text" class="form-control " id="bonus" onkeypress="return isNumberKey(event)" name="bonus">
-                                <span class="form-error text-danger">This is error</span>
-                            </div>
-                        </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-3">
-                            <div class="form-group">
-                                <label class="label required" for="contractStart">Effective From</label>
-                                <input type="text" class="form-control cursor datepicker" readonly value="<?php echo date('Y-m-d'); ?>" id="contractStart" name="contractStart">
-                                <span class="form-error text-danger">This is error</span>
-                            </div>
-                        </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-3">
-                            <div class="form-group">
-                                <label class="label required" for="contractEnd">Effective Untill</label>
-                                <input type="text" class="form-control cursor datepicker" readonly value="<?php echo date('Y-m-d', strtotime('+1 year')); ?>" id="contractEnd" name="contractEnd">
-                                <span class="form-error text-danger">This is error</span>
-                            </div>
-                        </div>
-                    </div>
+                    
 
                     <p class="bold smt-20" style="margin-bottom: 0px;">Education Information</p>
                     <div class="row education-row">
                         <div class="col col-xs-12 col-md-6 col-lg-4">
                             <div class="form-group">
-                                <label class="label required" for="degree">Degree</label>
+                                <label class="label " for="degree">Degree</label>
                                 <input type="text"  class="form-control degree" id="degree" name="degree">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
-                                <label class="label required" for="institution">Institution</label>
+                                <label class="label " for="institution">Institution</label>
                                 <input type="text"  class="form-control institution" id="institution" name="institution">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
-                                <label class="label required" onkeypress="return isNumberKey(event)" for="startYear">Started</label>
+                                <label class="label " onkeypress="return isNumberKey(event)" for="startYear">Started</label>
                                 <input type="text"  class="form-control startYear" id="startYear" name="startYear">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
-                                <label class="label required" for="endYear">Graduated</label>
+                                <label class="label " for="endYear">Graduated</label>
                                 <input type="text" onkeypress="return isNumberKey(event)"  class="form-control endYear" id="endYear" name="endYear">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-1">
                             <div class="form-group">
-                                <label class="label required">&nbsp;</label>
+                                <label class="label ">&nbsp;</label>
                                 <button type="button" class="btn form-control add-educationRow btn-info cursor" style="color: #fff;" >
                                 	<i class="fa fa-plus-square"></i>
                                 </button>
@@ -270,6 +329,14 @@
 
 				
 </div>
+
+<style type="text/css">
+    label.required:after {
+        content: "*";
+        color: red;
+        margin-left: 3px;
+    }
+</style>
 
 
 <?php 

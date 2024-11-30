@@ -36,7 +36,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 // return false;
                 let res = JSON.parse(response)
                 console.log(res)
-                // return false;
+                if(res.error) {
+                    toaster.error("Incorrect username/email or password", 'Sorry', { top: '5%', right: '0%', center: true, hide: false });
+                    return false;
+                }
+                
                 location.href = res.land
             },
             error: function(xhr, status, error) {

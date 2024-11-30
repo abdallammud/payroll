@@ -1,8 +1,8 @@
 <?php require('./files/login_header.php');?>
 	<div class="mx-3 mx-lg-0">
-		<div class="card my-5 col-xl-9 col-xxl-8 mx-auto rounded-4 overflow-hidden p-4">
+		<div class="card my-5 col-xl-3 col-xxl-3 col-lg-4 col-md-6 col-sm-12 mt-9 mx-auto rounded-4 overflow-hidden p-4" style="margin-top: 120px !important;">
 			<div class="row g-4">
-				<div class="col-lg-6 d-flex">
+				<div class="col-lg-12 d-flex">
 					<div class="card-body">
 						<img src="assets/images/logo1.png" class="mb-4" width="145" alt="">
 						<h4 class="fw-bold">Get Started Now</h4>
@@ -45,11 +45,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-lg-6 d-lg-flex d-none">
-					<div class="p-3 rounded-4 w-100 d-flex align-items-center justify-content-center bg-grd-primary">
-						<img src="assets/images/auth/login1.png" class="img-fluid" alt="">
-					</div>
-				</div>
+				
 
 			</div><!--end row-->
 		</div>

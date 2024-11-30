@@ -83,3 +83,32 @@ function formatDateRange(startDate, endDate) {
         return `${startFormattedWithYear} - ${endFormatted}`;
     }
 }
+function validateForm(form) {
+    let error = false; 
+    if(form instanceof jQuery || form instanceof HTMLElement) {
+        $(form).find('.validate').each(function() { 
+            let input = $(this); 
+            let value = input.val(); 
+            let message = input.data('msg');
+            console.log(form)
+            if(!message) message = "This is required";
+            let id = input.attr('id');  
+            error = !validateField(value, message, id) || error; 
+        }); 
+    }
+
+    return error;
+}
+function formatMoney(amount, currencySymbol = '$', decimals = 2) {
+    // Ensure the number is a valid value and round to the specified decimals
+    amount = parseFloat(amount).toFixed(decimals);
+
+    // Split the amount into integer and decimal parts
+    let [integerPart, decimalPart] = amount.split('.');
+
+    // Add thousands separator to the integer part
+    integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    // Combine integer part, decimal part and currency symbol
+    return currencySymbol + integerPart + (decimalPart ? '.' + decimalPart : '');
+}

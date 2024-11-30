@@ -40,6 +40,11 @@ class Toaster {
 			this.container.style.top = options.top || '10px';
 			this.container.style.right = options.right || '10px';
 			this.container.style.zIndex = '999999';
+			if(options.center) {
+				this.container.style.right = '0px';
+				this.container.style.left = '50%';
+				this.container.style.transform = 'translate(-50%, 0)';
+			}
 
 			// Auto-dismiss based on the autoHide option
 			if (autoHide) {

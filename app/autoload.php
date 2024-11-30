@@ -129,15 +129,7 @@ function get_menu_config() {
                         'show' => ['file' => 'chart_show', 'auth' => 'view_chart']
                     ],
                 ],
-                // 'currency' => [
-                //     'default' => 'currency',
-                //     'name' => 'currency',
-                //     'route' => 'currency',
-                //     'auth' => 'manage_company_info',
-                //     'actions' => [
-                //         'show' => ['file' => 'chart_show', 'auth' => 'view_chart']
-                //     ],
-                // ],
+               
                 'banks' => [
                     'default' => 'banks',
                     'name' => 'Bank accounts',
@@ -146,6 +138,13 @@ function get_menu_config() {
                     'actions' => [
                         'show' => 'chart_show'
                     ],
+                ],
+
+                'misc' => [
+                    'default' => 'misc',
+                    'name' => 'Miscellaneous',
+                    'route' => 'misc',
+                    'auth' => 'manage_departments',
                 ],
                 // Add other submenus here
             ],

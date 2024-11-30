@@ -38,5 +38,10 @@ function json($array) {
 }
 
 
+function formatMoney($amount, $currencySymbol = '$', $decimals = 2) {
+    $formattedAmount = number_format($amount, $decimals, '.', ',');
+    return $currencySymbol . $formattedAmount;
+}
+
 
 ?>
