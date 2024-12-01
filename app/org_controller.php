@@ -280,6 +280,40 @@ if(isset($_GET['action'])) {
 
 				// Return the result as a JSON response (for example in an API)
 				echo json_encode($result);
+			} else if($_GET['endpoint'] == 'budget_code') {
+				try {
+				    // Prepare data from POST request
+				    $post = escapePostData($_POST);
+				    $data = array(
+				        'name' => $post['name'], 
+				        'comments' => $post['comments'], 
+				        'added_by' => $_SESSION['user_id']
+				    );
+
+				    check_exists('budget_codes', ['name' => $post['name']]);
+				    check_auth('manage_budget_codes');
+
+				    // Call the create method
+				    $result['id'] = $budgetCodesClass->create($data);
+
+				    // If the branch is created successfully, return a success message
+				    if($result['id']) {
+				        $result['msg'] = 'Budget code created successfully';
+				        $result['error'] = false;
+				    } else {
+				        $result['msg'] = 'Something went wrong, please try again';
+				        $result['error'] = true;
+				    }
+
+				} catch (Exception $e) {
+				    // Catch any exceptions from the create method and return an error message
+				    $result['msg'] = 'Error: Something went wrong';
+				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
+				    $result['error'] = true;
+				}
+
+				// Return the result as a JSON response (for example in an API)
+				echo json_encode($result);
 			}
 
 			exit();
@@ -563,6 +597,42 @@ if(isset($_GET['action'])) {
 				    // If the branch is editted successfully, return a success message
 				    if($result['id']) {
 				        $result['msg'] = 'Contract type info editted successfully';
+				        $result['error'] = false;
+				    } else {
+				        $result['msg'] = 'Something went wrong, please try again';
+				        $result['error'] = true;
+				    }
+
+				} catch (Exception $e) {
+				    // Catch any exceptions from the create method and return an error message
+				    $result['msg'] = 'Error: Something went wrong';
+				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
+				    $result['error'] = true;
+				}
+
+				// Return the result as a JSON response (for example in an API)
+				echo json_encode($result);
+			} else if($_GET['endpoint'] == 'budget_code') {
+				try {
+				    // Prepare data from POST request
+				    $post = escapePostData($_POST);
+				    $data = array(
+				        'name' => $post['name'], 
+				        'comments' => isset($post['comments']) ? $post['comments']: "Active",
+				        'status' => isset($post['slcStatus']) ? $post['slcStatus']: "",
+				        'updated_by' => $_SESSION['user_id'],
+				        'updated_date' => $updated_date
+				    );
+
+				    check_exists('budget_codes', ['name' => $post['name']], ['id' => $post['id']]);
+				    check_auth('manage_budget_codes');
+
+				    // Call the create method
+				    $result['id'] = $budgetCodesClass->update($post['id'], $data);
+
+				    // If the branch is editted successfully, return a success message
+				    if($result['id']) {
+				        $result['msg'] = 'Budget code info editted successfully';
 				        $result['error'] = false;
 				    } else {
 				        $result['msg'] = 'Something went wrong, please try again';
@@ -935,6 +1005,47 @@ if(isset($_GET['action'])) {
 			    } else {
 			        $result['msg'] = "No records found";
 			    }
+			} else if ($_GET['endpoint'] === 'budget_codes') {
+				if (isset($_POST['order']) && isset($_POST['order'][0])) {
+				    $orderColumnMap = ['name'];
+				    $orderByIndex = (int)$_POST['order'][0]['column'];
+				    $orderBy = $orderColumnMap[$orderByIndex] ?? $orderBy;
+				    $order = strtoupper($_POST['order'][0]['dir']) === 'DESC' ? 'DESC' : 'ASC';
+				}
+			    // Base query
+			    $query = "SELECT * FROM `budget_codes` WHERE `id` IS NOT NULL";
+
+			    // Add search functionality
+			    if ($searchParam) {
+			        $query .= " AND (`name` LIKE '%" . escapeStr($searchParam) . "%' OR `comments` LIKE '%" . escapeStr($searchParam) . "%' )";
+			    }
+
+			    // Add ordering
+			    $query .= " ORDER BY `$orderBy` $order LIMIT $start, $length";
+
+			    // Execute query
+			    $budget_codes = $GLOBALS['conn']->query($query);
+
+			    // Count total records for pagination
+			    $countQuery = "SELECT COUNT(*) as total FROM `budget_codes` WHERE `id` IS NOT NULL";
+			    if ($searchParam) {
+			        $query .= " AND (`name` LIKE '%" . escapeStr($searchParam) . "%' OR `comments` LIKE '%" . escapeStr($searchParam) . "%' )";
+			    }
+
+			    // Execute count query
+			    $totalRecordsResult = $GLOBALS['conn']->query($countQuery);
+			    $totalRecords = $totalRecordsResult->fetch_assoc()['total'];
+
+			    if ($budget_codes->num_rows > 0) {
+			        while ($row = $budget_codes->fetch_assoc()) {
+			            $result['data'][] = $row;
+			        }
+			        $result['iTotalRecords'] = $totalRecords;
+			        $result['iTotalDisplayRecords'] = $totalRecords;
+			        $result['msg'] = $budget_codes->num_rows . " records were found.";
+			    } else {
+			        $result['msg'] = "No records found";
+			    }
 			}
 
 			echo json_encode($result);
@@ -995,6 +1106,8 @@ if(isset($_GET['action'])) {
 				json(get_data('projects', array('id' => $_POST['id'])));
 			} else if ($_GET['endpoint'] === 'contract_type') {
 				json(get_data('contract_types', array('id' => $_POST['id'])));
+			} else if ($_GET['endpoint'] === 'budget_code') {
+				json(get_data('budget_codes', array('id' => $_POST['id'])));
 			}
 
 			exit();
@@ -1192,6 +1305,32 @@ if(isset($_GET['action'])) {
 				    // Company deleted
 				    if($deleted) {
 				        $result['msg'] = 'Contract type has been  deleted successfully';
+				        $result['error'] = false;
+				    } else {
+				        $result['msg'] = 'Something went wrong, please try again';
+				        $result['error'] = true;
+				    }
+
+				} catch (Exception $e) {
+				    // Catch any exceptions from the create method and return an error message
+				    $result['msg'] = 'Error: Something went wrong';
+				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
+				    $result['error'] = true;
+				}
+
+				// Return the result as a JSON response (for example in an API)
+				echo json_encode($result);
+			} else if ($_GET['endpoint'] === 'budget_code') {
+				try {
+				    // Delete branchClass
+				    $post = escapePostData($_POST);
+				    // checkForeignKey($post['id'], 'state_id', ['employees']);
+				    check_auth('manage_budget_codes');
+				    $deleted = $budgetCodesClass->delete($post['id']);
+
+				    // Company deleted
+				    if($deleted) {
+				        $result['msg'] = 'Budget code has been  deleted successfully';
 				        $result['error'] = false;
 				    } else {
 				        $result['msg'] = 'Something went wrong, please try again';

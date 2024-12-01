@@ -151,13 +151,6 @@ function settingsArray() {
             'details' => 'Staff number prefix', 
             'remarks' => ''
         ],
-        'other' => [
-            'type' => 'other',
-            'value' => 'Testing', 
-            'section' => 'employees', 
-            'details' => 'Here and there', 
-            'remarks' => ''
-        ],
         'working_hours' => [
             'type' => 'working_hours',
             'value' => '8', 
@@ -167,7 +160,7 @@ function settingsArray() {
         ],
         'working_days' => [
             'type' => 'working_days',
-            'value' => '8', 
+            'value' => '5', 
             'section' => 'payroll', 
             'details' => 'Working days per week', 
             'remarks' => 'required'

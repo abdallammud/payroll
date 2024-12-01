@@ -23,3 +23,12 @@ class ContractTypes extends Model {
 }
 
 $GLOBALS['contractTypesClass'] = $contractTypesClass = new ContractTypes();
+
+
+class BudgetCodes extends Model {
+    public function __construct() {
+        parent::__construct('budget_codes');
+    }
+}
+
+$GLOBALS['budgetCodesClass'] = $budgetCodesClass = new BudgetCodes();
