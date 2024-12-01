@@ -18,6 +18,7 @@ RewriteRule ^chart/?$ index.php?menu=org&tab=chart [NC,L]
 RewriteRule ^locations/?$ index.php?menu=org&tab=locations [NC,L]
 RewriteRule ^currency/?$ index.php?menu=org&tab=currency [NC,L]
 RewriteRule ^banks/?$ index.php?menu=org&tab=banks [NC,L]
+RewriteRule ^misc/?$ index.php?menu=org&tab=misc [NC,L]
 
 
 RewriteRule ^employees/?$ index.php?menu=hrm&tab=employees [NC,L]
