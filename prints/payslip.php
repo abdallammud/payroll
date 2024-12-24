@@ -305,7 +305,7 @@ $pdf->MultiCell(50, 7, strtoupper($rec['full_name']), "LBR", "C", 'C', 'F');
 
 $y += 10;
 $pdf->SetXY(20, $y);
-$pdf->MultiCell(50, 7, strtoupper("signiture"), "LBR", "C", 'C', 'F');
+$pdf->MultiCell(50, 7, strtoupper("SIGNATURE"), "LBR", "C", 'C', 'F');
 
 $y += 10;
 $pdf->SetXY(20, $y);
@@ -337,7 +337,7 @@ $pdf->MultiCell(50, 7, strtoupper($hrUserInfo), "LBR", "C", 'C', 'F');
 
 $y2 += 10;
 $pdf->SetXY(75, $y2);
-$pdf->MultiCell(50, 7, strtoupper("signiture"), "LBR", "C", 'C', 'F');
+$pdf->MultiCell(50, 7, strtoupper("SIGNATURE"), "LBR", "C", 'C', 'F');
 
 $y2 += 10;
 $pdf->SetXY(75, $y2);
@@ -372,7 +372,7 @@ $pdf->MultiCell(50, 7, strtoupper($fnUserInfo), "LBR", "C", 'C', 'F');
 
 $y3 += 10;
 $pdf->SetXY(130, $y3);
-$pdf->MultiCell(50, 7, strtoupper("signiture"), "LBR", "C", 'C', 'F');
+$pdf->MultiCell(50, 7, strtoupper("SIGNATURE"), "LBR", "C", 'C', 'F');
 
 $y3 += 10;
 $pdf->SetXY(130, $y3);

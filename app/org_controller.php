@@ -44,9 +44,9 @@ if(isset($_GET['action'])) {
 				    // Prepare data from POST request
 				    $data = array(
 				        'name' => $_POST['name'], 
-				        'address' => $_POST['address'], 
-				        'contact_phone' => $_POST['phones'], 
-				        'contact_email' => $_POST['emails']
+				        'address' => isset($_POST['address']) ? $_POST['address'] : '', 
+				        'contact_phone' => isset($_POST['contact_phone']) ? $_POST['contact_phone'] : '', 
+				        'contact_email' => isset($_POST['contact_email']) ? $_POST['contact_email'] : '', 
 				    );
 
 				    check_exists('branches', ['name' => $_POST['name']]);
@@ -364,9 +364,10 @@ if(isset($_GET['action'])) {
 				    $data = array(
 				    	'id' => $_POST['id'], 
 				        'name' => $_POST['name'], 
-				        'address' => $_POST['address'], 
-				        'contact_phone' => $_POST['phones'], 
-				        'contact_email' => $_POST['emails']
+
+				        'address' => isset($_POST['address']) ? $_POST['address'] : '', 
+				        'contact_phone' => isset($_POST['phones']) ? $_POST['phones'] : '', 
+				        'contact_email' => isset($_POST['emails']) ? $_POST['emails'] : '', 
 				    );
 
 				    check_exists('branches', ['name' => $_POST['name']], ['id' => $_POST['id']]);

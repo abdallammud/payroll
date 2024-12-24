@@ -11,8 +11,8 @@ if (!authenticate()) {
 if(isset($_GET['print'])) {
 	if($_GET['print'] == 'payslip') {
 		require('prints/payslip.php');
-	} else if($_GET['print'] == 'customers') {
-		require('prints/allCustomers.php');
+	} else if($_GET['print'] == 'employees') {
+		require('prints/allEmployees.php');
 	} else if($_GET['print'] == 'book_transactions') {
 		require('prints/book_transactions.php');
 	} else if($_GET['print'] == 'customer_transactions') {

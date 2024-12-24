@@ -48,7 +48,7 @@
                                 	<option value="">- Select</option>
                                 	<option value="Admin">Admin</option>
                                 	<option value="User">User</option>
-                                	<option value="Employee">Employee</option>
+                                	<!-- <option value="Employee">Employee</option> -->
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
@@ -74,7 +74,7 @@
 
 						<?php foreach ($permissions as $group => $groupPermissions): ?>
 				            <div class="col col-xs-12 col-md-6 col-lg-4">
-				                <div class="card text-dark bg-light mb-3">
+				                <div class="card  bg-light mb-3">
 				                    <div class="card-header bold"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $group))) ?> Permissions</div>
 				                    <div class="card-body">
 				                        <?php foreach ($groupPermissions as $permission): ?>
@@ -111,7 +111,13 @@
 				
 </div>
 
+<style type="text/css">
+    .card-header {
+        color: var(--bs-heading-color);
+    }
 
+    [data-bs-theme=dark] body .sidebar-nav .metismenu a:hover
+</style>
 <?php 
 // require('org_edit.php');
 ?>

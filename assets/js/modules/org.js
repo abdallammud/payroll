@@ -249,7 +249,7 @@ function load_branches() {
 	    "serverSide": true,
 	    "bDestroy": true,
 	    "columnDefs": [
-	        { "orderable": false, "searchable": false, "targets": [4] }  // Disable search on first and last columns
+	        { "orderable": false, "searchable": false, "targets": [1] }  // Disable search on first and last columns
 	    ],
 	    "serverMethod": 'post',
 	    "ajax": {
@@ -270,7 +270,7 @@ function load_branches() {
 	                </div>`;
 	        }},
 
-	        { title: "Phone Numbers", data: null, render: function(data, type, row) {
+	       /* { title: "Phone Numbers", data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.contact_phone}</span>
 	                </div>`;
@@ -286,7 +286,7 @@ function load_branches() {
 	            return `<div>
 	            		<span>${row.address}</span>
 	                </div>`;
-	        }},
+	        }},*/
 
 	        { title: "Action", data: null, render: function(data, type, row) {
 	            return `<div class="sflex scenter-items">
@@ -372,22 +372,22 @@ async function handle_addBranchForm(form) {
     clearErrors();
 
     let name = $(form).find('#branchName').val();
-    let phones = $(form).find('#contactPhone').val();
+    /*let phones = $(form).find('#contactPhone').val();
     let emails = $(form).find('#contactEmail').val();
-    let address = $(form).find('#txtAddress').val();
+    let address = $(form).find('#txtAddress').val();*/
 
     // Input validation
     let error = false;
-    error = !validateField(name, `${branch_keyword.sing} name is required`, 'branchName') || error;
-    error = !validateField(phones, `${branch_keyword.sing} phone number is required`, 'contactPhone') || error;
+    /*error = !validateField(name, `${branch_keyword.sing} name is required`, 'branchName') || error;
+    error = !validateField(phones, `${branch_keyword.sing} phone number is required`, 'contactPhone') || error;*/
 
     if (error) return false;
 
     let formData = {
-        name: name,
-        phones: phones,
+        name: name
+        /*phones: phones,
         emails: emails,
-        address: address
+        address: address*/
     };
 
     form_loading(form);
@@ -421,23 +421,23 @@ async function handle_editBranchForm(form) {
 
     let id = $(form).find('#branch_id').val();
     let name = $(form).find('#branchName4Edit').val();
-    let phones = $(form).find('#contactPhone4Edit').val();
+    /*let phones = $(form).find('#contactPhone4Edit').val();
     let emails = $(form).find('#contactEmail4Edit').val();
-    let address = $(form).find('#txtAddress4Edit').val();
+    let address = $(form).find('#txtAddress4Edit').val();*/
 
     // Input validation
     let error = false;
-    error = !validateField(name, `${branch_keyword.sing} name is required`, 'branchName4Edit') || error;
-    error = !validateField(phones, `${branch_keyword.sing} phone number is required`, 'contactPhone4Edit') || error;
+    /*error = !validateField(name, `${branch_keyword.sing} name is required`, 'branchName4Edit') || error;
+    error = !validateField(phones, `${branch_keyword.sing} phone number is required`, 'contactPhone4Edit') || error;*/
 
     if (error) return false;
 
     let formData = {
     	id:id,
-        name: name,
-        phones: phones,
+        name: name
+        /*phones: phones,
         emails: emails,
-        address: address
+        address: address*/
     };
 
     form_loading(form);

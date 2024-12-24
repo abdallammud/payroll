@@ -988,5 +988,25 @@ document.addEventListener("DOMContentLoaded", function() {
 		    }
 		}
     })
+
+    // Search location
+    $(document).on('keyup', '.bootstrap-select.searchLocation input.form-control', async (e) => {
+    	let search = $(e.target).val();
+    	let searchFor = 'leave';
+    	let formData = {search:search, searchFor:searchFor}
+		if(search) {
+			try {
+		        let response = await send_attendancePost('search location4Select', formData);
+		        console.log(response)
+		        let res = JSON.parse(response);
+		        if(!res.error) {
+					$('#searchLocation').html(res.options)
+					$('.my-select').selectpicker('refresh');
+				} 
+		    } catch (err) {
+		        console.error('Error occurred during form submission:', err);
+		    }
+		}
+    })
 });
 

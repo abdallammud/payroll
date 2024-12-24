@@ -269,7 +269,7 @@
         </div>
       </div>
 
-
+      <script src="<?=baseUri();?>/assets/js/modules/dashboard.js"></script>
       <script type="text/javascript">
         
       </script>

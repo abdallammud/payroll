@@ -47,7 +47,7 @@ $userPermissions = $GLOBALS['userClass']->getPermission_ids($_GET['user_id']);
                                 	<option value="">- Select</option>
                                 	<option <?php if(trim($user['role']) == 'Admin') echo 'selected="selected"'; ?>  value="Admin">Admin</option>
                                 	<option <?php if(trim($user['role']) == 'User') echo 'selected="selected"'; ?>  value="User">User</option>
-                                	<option <?php if(trim($user['role']) == 'Employee') echo 'selected="selected"'; ?>  value="Employee">Employee</option>
+                                	<!-- <option <?php if(trim($user['role']) == 'Employee') echo 'selected="selected"'; ?>  value="Employee">Employee</option> -->
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
@@ -83,7 +83,7 @@ $userPermissions = $GLOBALS['userClass']->getPermission_ids($_GET['user_id']);
 
 						<?php foreach ($permissions as $group => $groupPermissions): ?>
 				            <div class="col col-xs-12 col-md-6 col-lg-4">
-				                <div class="card text-dark bg-light mb-3">
+				                <div class="card  bg-light mb-3">
 				                    <div class="card-header bold"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $group))) ?> Permissions</div>
 				                    <div class="card-body">
 				                        <?php foreach ($groupPermissions as $permission): ?>

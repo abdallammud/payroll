@@ -1,6 +1,8 @@
-$(document).ready(() => {
-	get_dashboadCards() ;
-})
+
+
+addEventListener("DOMContentLoaded", (event) => {
+    get_dashboadCards() ;
+});
 
 function get_dashboadCards() {
 	$.post(`${base_url}/app/dashboard_data.php?action=get&endpoint=cards`, {}, function (data) {

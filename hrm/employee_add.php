@@ -268,7 +268,7 @@
                         <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
                                 <label class="label " for="workDays">Working days/week</label>
-                                 <input type="text" value="<?=sys_setting('working_days');?>"  name="workDays" class="form-control" id="workDays" />
+                                 <input type="text" onkeypress="return isNumberKeyWihtLimit(event, 7)" value="<?=sys_setting('working_days');?>"  name="workDays" class="form-control" id="workDays" />
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
@@ -276,7 +276,7 @@
                         <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
                                 <label class="label " for="workHours">Working hours/day</label>
-                                 <input type="text" value="<?=sys_setting('working_hours');?>"  name="workHours" class="form-control" id="workHours" />
+                                 <input type="text" value="<?=sys_setting('working_hours');?>"  name="workHours" onkeypress="return isNumberKeyWihtLimit(event, 24)" class="form-control" id="workHours" />
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>

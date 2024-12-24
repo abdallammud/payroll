@@ -28,7 +28,7 @@
 .info-tooltip .tooltip-div {
 	position: absolute;
 	font-weight: normal;
-	background: #fff;
+	background: var(--page-bg);
 	z-index: 9999;
 	padding: 10px;
 	box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;

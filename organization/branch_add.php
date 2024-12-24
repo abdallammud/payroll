@@ -18,7 +18,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col col-xs-12">
                             <div class="form-group">
                                 <label class="label required" for="contactPhone">Phone numbers</label>
@@ -44,7 +44,7 @@
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 

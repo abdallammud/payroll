@@ -1,10 +1,36 @@
-function isNumberKey(e) {
+function isNumberKey(e, maxVal = '') {
     var charCode = (e.which) ? e.which : e.keyCode;
     if (charCode !== 8 && charCode !== 46 && !/\d/.test(String.fromCharCode(charCode))) {
     return false;
     }
     return true;
 }
+function isNumberKeyWihtLimit(e, maxVal = '') {
+    var charCode = (e.which) ? e.which : e.keyCode;
+
+    // Allow backspace and delete keys
+    if (charCode === 8 || charCode === 46) {
+        return true;
+    }
+
+    // Check if the input is a number
+    if (!/\d/.test(String.fromCharCode(charCode))) {
+        return false;
+    }
+
+    // Get the current input value and the new character being added
+    var input = e.target;
+    var currentValue = input.value;
+    var newValue = currentValue + String.fromCharCode(charCode);
+
+    // If maxVal is provided, ensure the new value does not exceed it
+    if (maxVal !== '' && parseInt(newValue) > parseInt(maxVal)) {
+        return false;
+    }
+
+    return true;
+}
+
 function isNumberOrCommaKey(e) {
     // Allow only numbers, period, comma, and delete keys
     var charCode = (e.which) ? e.which : e.keyCode;

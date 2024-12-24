@@ -41,7 +41,7 @@
 	<script src="<?=baseUri();?>/assets/js/main.js"></script>
 	<script src="<?=baseUri();?>/assets/js/utilities.js"></script>
 	<script src="<?=baseUri();?>/assets/js/script.js"></script>
-	<script src="<?=baseUri();?>/assets/js/modules/dashboard.js"></script>
+	
 	<!-- <script src="<?=baseUri();?>/assets/js/dashboard1.js"></script> -->
 	<script>
 	// new PerfectScrollbar(".user-list")
