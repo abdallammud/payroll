@@ -32,3 +32,12 @@ class BudgetCodes extends Model {
 }
 
 $GLOBALS['budgetCodesClass'] = $budgetCodesClass = new BudgetCodes();
+
+
+class BanksClass extends Model {
+    public function __construct() {
+        parent::__construct('banks');
+    }
+}
+
+$GLOBALS['banksClass'] = $banksClass = new BanksClass();

@@ -50,7 +50,7 @@
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
                                 <label class="label" for="nationalID">ID Number</label>
-                                <input type="text" placeholder="National ID"  class="form-control " id="nationalID" name="nationalID">
+                                <input type="text"   class="form-control " id="nationalID" name="nationalID">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
@@ -104,15 +104,21 @@
 
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
-                                <label class="label " for="bankName">Payment Through</label>
-                                <input type="text"  class="form-control " id="bankName" name="bankName" placeholder="Bank name">
+                                <label class="label " for="bankName">Bank Account</label>
+                                <!-- <input type="text"  class="form-control " id="bankName" name="bankName" placeholder="Bank name"> -->
+                                <select  name="bankName" class="form-control "  id="bankName">
+                                    <option value="">- Select </option>
+                                    <?php 
+                                    select_active('banks', ['value' => 'name']);
+                                    ?>
+                                </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
-                               <label class="label ">&nbsp;</label>
-                                <input type="text"  class="form-control " id="accountNo" name="accountNo" placeholder="Account number">
+                               <label class="label ">Account Number</label>
+                                <input type="text"  class="form-control " id="accountNo" name="accountNo" >
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>

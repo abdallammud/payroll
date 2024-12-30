@@ -12,14 +12,14 @@
 							<form class="row g-3" id="userLoginForm">
 								<div class="col-12 div">
 									<label for="inputEmailAddress" class="form-label">Email or Username</label>
-									<input type="text" class="form-control" id="inputEmailAddress" placeholder="Required">
+									<input type="text" class="form-control" id="inputEmailAddress" >
 									<span class="form-error text-danger">This is error</span>
 								</div>
 								<div class="col-12 div">
 									<label for="inputChoosePassword" class="form-label">Password</label>
 									<div class="input-group" id="show_hide_password">
-										<input type="password" class="form-control border-end-0" id="inputChoosePassword" value="12345678"
-										placeholder="Enter Password">
+										<input type="password" class="form-control border-end-0" id="inputChoosePassword" 
+										>
 										<a href="javascript:;" class="input-group-text bg-transparent"><i
 										class="bi bi-eye-slash-fill"></i></a>
 									</div>
@@ -33,7 +33,7 @@
 									</div> -->
 								</div>
 								<div class="col-md-6 text-end mt-2">
-									<a href="auth-boxed-forgot-password.html">Forgot Password ?</a>
+									<a href="#">Forgot Password ?</a>
 								</div>
 								<div class="col-12 mt-2">
 									<div class="d-grid">

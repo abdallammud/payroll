@@ -314,6 +314,39 @@ if(isset($_GET['action'])) {
 
 				// Return the result as a JSON response (for example in an API)
 				echo json_encode($result);
+			} else if($_GET['endpoint'] == 'bank') {
+				try {
+				    // Prepare data from POST request
+				    $post = escapePostData($_POST);
+				    $data = array(
+				        'name' => $post['name'], 
+				        'added_by' => $_SESSION['user_id']
+				    );
+
+				    check_exists('banks', ['name' => $post['name']]);
+				    check_auth('manage_company_banks');
+
+				    // Call the create method
+				    $result['id'] = $banksClass->create($data);
+
+				    // If the branch is created successfully, return a success message
+				    if($result['id']) {
+				        $result['msg'] = 'Bank name created successfully';
+				        $result['error'] = false;
+				    } else {
+				        $result['msg'] = 'Something went wrong, please try again';
+				        $result['error'] = true;
+				    }
+
+				} catch (Exception $e) {
+				    // Catch any exceptions from the create method and return an error message
+				    $result['msg'] = 'Error: Something went wrong';
+				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
+				    $result['error'] = true;
+				}
+
+				// Return the result as a JSON response (for example in an API)
+				echo json_encode($result);
 			}
 
 			exit();
@@ -634,6 +667,41 @@ if(isset($_GET['action'])) {
 				    // If the branch is editted successfully, return a success message
 				    if($result['id']) {
 				        $result['msg'] = 'Budget code info editted successfully';
+				        $result['error'] = false;
+				    } else {
+				        $result['msg'] = 'Something went wrong, please try again';
+				        $result['error'] = true;
+				    }
+
+				} catch (Exception $e) {
+				    // Catch any exceptions from the create method and return an error message
+				    $result['msg'] = 'Error: Something went wrong';
+				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
+				    $result['error'] = true;
+				}
+
+				// Return the result as a JSON response (for example in an API)
+				echo json_encode($result);
+			} else if($_GET['endpoint'] == 'bank') {
+				try {
+				    // Prepare data from POST request
+				    $post = escapePostData($_POST);
+				    $data = array(
+				        'name' => $post['name'], 
+				        'status' => isset($post['slcStatus']) ? $post['slcStatus']: "Active" ,
+				        'updated_by' => $_SESSION['user_id'],
+				        'updated_date' => $updated_date
+				    );
+
+				    check_exists('banks', ['name' => $post['name']], ['id' => $post['id']]);
+				    check_auth('manage_company_banks');
+
+				    // Call the create method
+				    $result['id'] = $banksClass->update($post['id'], $data);
+
+				    // If the branch is editted successfully, return a success message
+				    if($result['id']) {
+				        $result['msg'] = 'Bank info editted successfully';
 				        $result['error'] = false;
 				    } else {
 				        $result['msg'] = 'Something went wrong, please try again';
@@ -1047,6 +1115,47 @@ if(isset($_GET['action'])) {
 			    } else {
 			        $result['msg'] = "No records found";
 			    }
+			} else if ($_GET['endpoint'] === 'all_banks') {
+				if (isset($_POST['order']) && isset($_POST['order'][0])) {
+				    $orderColumnMap = ['name'];
+				    $orderByIndex = (int)$_POST['order'][0]['column'];
+				    $orderBy = $orderColumnMap[$orderByIndex] ?? $orderBy;
+				    $order = strtoupper($_POST['order'][0]['dir']) === 'DESC' ? 'DESC' : 'ASC';
+				}
+			    // Base query
+			    $query = "SELECT * FROM `banks` WHERE `id` IS NOT NULL";
+
+			    // Add search functionality
+			    if ($searchParam) {
+			        $query .= " AND (`name` LIKE '%" . escapeStr($searchParam) . "%')";
+			    }
+
+			    // Add ordering
+			    $query .= " ORDER BY `$orderBy` $order LIMIT $start, $length";
+
+			    // Execute query
+			    $banks = $GLOBALS['conn']->query($query);
+
+			    // Count total records for pagination
+			    $countQuery = "SELECT COUNT(*) as total FROM `banks` WHERE `id` IS NOT NULL";
+			    if ($searchParam) {
+			        $query .= " AND (`name` LIKE '%" . escapeStr($searchParam) . "%')";
+			    }
+
+			    // Execute count query
+			    $totalRecordsResult = $GLOBALS['conn']->query($countQuery);
+			    $totalRecords = $totalRecordsResult->fetch_assoc()['total'];
+
+			    if ($banks->num_rows > 0) {
+			        while ($row = $banks->fetch_assoc()) {
+			            $result['data'][] = $row;
+			        }
+			        $result['iTotalRecords'] = $totalRecords;
+			        $result['iTotalDisplayRecords'] = $totalRecords;
+			        $result['msg'] = $banks->num_rows . " records were found.";
+			    } else {
+			        $result['msg'] = "No records found";
+			    }
 			}
 
 			echo json_encode($result);
@@ -1109,6 +1218,8 @@ if(isset($_GET['action'])) {
 				json(get_data('contract_types', array('id' => $_POST['id'])));
 			} else if ($_GET['endpoint'] === 'budget_code') {
 				json(get_data('budget_codes', array('id' => $_POST['id'])));
+			} else if ($_GET['endpoint'] === 'bank') {
+				json(get_data('banks', array('id' => $_POST['id'])));
 			}
 
 			exit();
@@ -1305,6 +1416,31 @@ if(isset($_GET['action'])) {
 				    // Company deleted
 				    if($deleted) {
 				        $result['msg'] = 'Contract type has been  deleted successfully';
+				        $result['error'] = false;
+				    } else {
+				        $result['msg'] = 'Something went wrong, please try again';
+				        $result['error'] = true;
+				    }
+
+				} catch (Exception $e) {
+				    // Catch any exceptions from the create method and return an error message
+				    $result['msg'] = 'Error: Something went wrong';
+				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
+				    $result['error'] = true;
+				}
+
+				// Return the result as a JSON response (for example in an API)
+				echo json_encode($result);
+			} else if ($_GET['endpoint'] === 'bank') {
+				try {
+				    // Delete branchClass
+				    $post = escapePostData($_POST);
+				    check_auth('manage_company_banks');
+				    $deleted = $banksClass->delete($post['id']);
+
+				    // Company deleted
+				    if($deleted) {
+				        $result['msg'] = 'Bank name has been  deleted successfully';
 				        $result['error'] = false;
 				    } else {
 				        $result['msg'] = 'Something went wrong, please try again';

@@ -1478,7 +1478,7 @@ function load_projects() {
 	    "processing": true,
 	    "serverSide": true,
 	    "bDestroy": true,
-	    // "searching": false,  
+	    "searching": false,  
 	    "info": false,
 	    "columnDefs": [
 	        { "orderable": false, "searchable": false,  "targets": [2] }  // Disable search on first and last columns
@@ -1895,7 +1895,7 @@ function load_budgetCodes() {
 	    "processing": true,
 	    "serverSide": true,
 	    "bDestroy": true,
-	    // "searching": false,  
+	    "searching": false,  
 	    "info": false,
 	    "columnDefs": [
 	        { "orderable": false, "searchable": false,  "targets": [2] }  // Disable search on first and last columns
@@ -2100,7 +2100,206 @@ async function get_budgetCode(id) {
 	return response;
 }
 
+// Budget codes
+function load_allBanks() {
+	var datatable = $('#allBanksDT').DataTable({
+		// let datatable = new DataTable('#companyDT', {
+	    "processing": true,
+	    "serverSide": true,
+	    "bDestroy": true,
+	    "searching": false,  
+	    "info": false,
+	    "columnDefs": [
+	        { "orderable": false, "searchable": false,  "targets": [1] }  // Disable search on first and last columns
+	    ],
+	    "serverMethod": 'post',
+	    "ajax": {
+	        "url": "./app/org_controller.php?action=load&endpoint=all_banks",
+	        "method": "POST",
+		    /*dataFilter: function(data) {
+				console.log(data)
+			}*/
+	    },
+	    
+	    "createdRow": function(row, data, dataIndex) { 
+	    	// Add your custom class to the row 
+	    	$(row).addClass('table-row ' +data.status.toLowerCase());
+	    },
+	    columns: [
+	        { title: `Name`, data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.name}</span>
+	                </div>`;
+	        }},
 
+	        { title: "Action", data: null, render: function(data, type, row) {
+	            return `<div class="sflex scenter-items">
+            		<span data-recid="${row.id}" class="fa edit_allBanksInfo smt-5 cursor smr-10 fa-pencil"></span>
+            		<span data-recid="${row.id}" class="fa delete_allBanks smt-5 cursor fa-trash"></span>
+                </div>`;
+	        }},
+	    ]
+	});
+
+	return false;
+}
+
+function handleAllBanks() {
+	$('#addbankForm').on('submit', (e) => {
+		handle_addbankForm(e.target);
+		return false
+	})
+
+	load_allBanks();
+
+	// Edit location
+	$(document).on('click', '.edit_allBanksInfo', async (e) => {
+	    let id = $(e.currentTarget).data('recid');
+	    let modal = $('#edit_bank');
+
+	    let data = await get_bank(id);
+	    console.log(data)
+	    if(data) {
+	    	let res = JSON.parse(data)[0];
+	    	console.log(res)
+	    	$(modal).find('#bank_id').val(id);
+	    	$(modal).find('#bankName4Edit').val(res.name);
+	    	$(modal).find('#slcStatus').val(res.status);
+	    }
+
+	    $(modal).modal('show');
+	});
+
+	// Edit location info form
+	$('#editAllBankForm').on('submit', (e) => {
+		handle_editAllBankForm(e.target);
+		return false
+	})
+
+	// Delete location
+	$(document).on('click', '.delete_allBanks', async (e) => {
+	    let id = $(e.currentTarget).data('recid');
+	    swal({
+	        title: "Are you sure?",
+	        text: `You are going to delete this bank.`,
+	        icon: "warning",
+	        className: 'warning-swal',
+	        buttons: ["Cancel", "Yes, delete"],
+	    }).then(async (confirm) => {
+	        if (confirm) {
+	            let data = { id: id };
+	            try {
+	                let response = await send_orgPost('delete bank', data);
+	                console.log(response)
+	                if (response) {
+	                    let res = JSON.parse(response);
+	                    if (res.error) {
+	                        toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+	                    } else {
+	                        toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration: 1000 }).then(() => {
+	                            location.reload();
+	                            // load_branches();
+	                        });
+	                        console.log(res);
+	                    }
+	                } else {
+	                    console.log('Failed to edit state.' + response);
+	                }
+
+	            } catch (err) {
+	                console.error('Error occurred during form submission:', err);
+	            }
+	        }
+	    });
+	});
+}
+
+async function handle_addbankForm(form) {
+    clearErrors();
+    let error = validateForm(form)
+
+    let name 	= $(form).find('#bankName').val();
+
+    if (error) return false;
+
+    let formData = {
+        name: name,
+    };
+
+    form_loading(form);
+
+    try {
+        let response = await send_orgPost('save bank', formData);
+        console.log(response)
+        if (response) {
+            let res = JSON.parse(response)
+            $('#add_budgetCode').modal('hide');
+            if(res.error) {
+            	toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+            } else {
+            	toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration:1000 }).then(() => {
+            		location.reload();
+            		// load_budgetCodes();
+            	});
+            	console.log(res)
+            }
+        } else {
+            console.log('Failed to save state.' + response);
+        }
+
+    } catch (err) {
+        console.error('Error occurred during form submission:', err);
+    }
+}
+
+async function handle_editAllBankForm(form) {
+    clearErrors();
+    let error = validateForm(form)
+
+    console.log(form)
+
+    let id 	= $(form).find('#bank_id').val();
+   	let name 	= $(form).find('#bankName4Edit').val();
+    let slcStatus 	= $(form).find('#slcStatus').val();
+
+    if (error) return false;
+
+    let formData = {
+    	id:id,
+        name: name,
+        slcStatus:slcStatus
+    };
+
+    form_loading(form);
+    try {
+        let response = await send_orgPost('update bank', formData);
+        console.log(response)
+        if (response) {
+            let res = JSON.parse(response)
+            $('#edit_budgetCode').modal('hide');
+            if(res.error) {
+            	toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+            } else {
+            	toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration:1000 }).then(() => {
+            		location.reload();
+            		// load_budgetCodes();
+            	});
+            	console.log(res)
+            }
+        } else {
+            console.log('Failed to save state.' + response);
+        }
+
+    } catch (err) {
+        console.error('Error occurred during form submission:', err);
+    }
+}
+
+async function get_bank(id) {
+	let data = {id};
+	let response = await send_orgPost('get bank', data);
+	return response;
+}
 
 
 
@@ -2114,4 +2313,5 @@ document.addEventListener("DOMContentLoaded", function() {
 	handleProjects();
 	handleContractTypes();
 	handleBudgetCodes();
+	handleAllBanks();
 });
