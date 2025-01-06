@@ -29,7 +29,7 @@ if (!authenticate()) {
   <link href="<?=baseUri();?>/assets/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Material+Icons+Outlined" rel="stylesheet">
-
+  <link href="<?=baseUri();?>/assets/css/sumo_select.css" rel="stylesheet">
   <!--main css-->
   <link href="<?=baseUri();?>/assets/css/bootstrap-extended.css" rel="stylesheet">
   <link href="<?=baseUri();?>/assets/sass/main.css" rel="stylesheet">

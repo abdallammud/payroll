@@ -169,45 +169,30 @@ if(isset($_GET['action'])) {
 
 				echo json_encode($result);
 			} else if($_GET['endpoint'] == 'payroll') {
+				// Payroll generate
 				try {
-				    // Prepare data from POST request
+					// Prepare data from POST request
 				    $GLOBALS['conn']->begin_transaction();
 				    $post = escapePostData($_POST);
-				    $month = date('Y-m', strtotime($post['month']));
 
 				    if($post['ref'] = 'All') {
 				    	$post['ref_id'] = '';
 				    	$post['ref_name'] = 'All employees';
 				    }
 
-				    // Check unapproved transactions
-				    $checkRequest = $GLOBALS['conn']->query("SELECT * FROM `employee_transactions` WHERE `date` LIKE '$month%' AND `status` = 'Request'");
-				    if($checkRequest->num_rows > 0) {
-				    	$result['msg'] = 'There are some unapproved employee transactions, please approve them or delete them from system.';
-				        $result['error'] = true;
-				        echo json_encode($result);
-				        exit();
-				    }
-
+				    $month = date('Y-m');
 				    $data = array(
 				        'ref' 		=> $post['ref'], 
 				        'ref_id' 	=> $post['ref_id'], 
+				        'month' 	=> $month,
 				        'ref_name' 	=> $post['ref_name'], 
-				        'month' 	=> $month, 
 				        'added_by' 	=> $_SESSION['user_id']
 				    );
 
 				    check_auth('generate_payroll');
-				    $check_exists = get_data('payroll', ['month' => $month]);
-				    if($check_exists) {
-				    	$result['id'] = $check_exists[0]['id'];
-				    } else {
-				    	// Call the create method
-				    	$result['id'] = $payrollClass->create($data);
-				    }
-				    
-				    if($result['id']) {
-				    	$payroll_id = $result['id'];
+				    $payroll_id = $payrollClass->create($data);
+
+				    if($payroll_id) {
 				    	if($post['ref']) {
 				    		$ref_id = $post['ref_id'];
 				    		$get_employees = "SELECT * FROM `employees` WHERE `status` = 'active'";
@@ -220,126 +205,140 @@ if(isset($_GET['action'])) {
 				    		}
 
 				    		$empSet = $GLOBALS['conn']->query($get_employees);
+
+				    		$months = '';
 				    		if($empSet->num_rows > 0) {
 				    			while ($row = $empSet->fetch_assoc()) {
-								    $employeeId = $row['employee_id'];
-								    $fullName = $row['full_name'];
-								    $phoneNumber = $row['phone_number'];
-								    $email = $row['email'];
-								    $staffNo = $row['staff_no'];
-								    $contractType = $row['contract_type'];
-								    $paymentBank = $row['payment_bank'];
+								    $employeeId 	= $row['employee_id'];
+								    $fullName 		= $row['full_name'];
+								    $phoneNumber 	= $row['phone_number'];
+								    $email 			= $row['email'];
+								    $staffNo 		= $row['staff_no'];
+								    $contractType 	= $row['contract_type'];
+								    $paymentBank 	= $row['payment_bank'];
 								    $paymentAccount = $row['payment_account'];
-								    $state_id = $row['state_id'];
-								    $workDays = $row['work_days'];
-								    $workHours = $row['work_hours'];
-								    $position = $row['position'];
-								    $salary = $row['salary'];
+								    $state_id 		= $row['state_id'];
+								    $workDays 	= $row['work_days'];
+								    $workHours 	= $row['work_hours'];
+								    $position 	= $row['position'];
+								    $salary 	= $row['salary'];
 
-								    // Attendance information
-								    $attendanceInfo = calculateAttendanceStats($employeeId, $month);
+								    
 
-								    // Calculate required work days in the month
-								    $requiredDays = getWorkdaysInMonth($month, $workDays);
-								    $requiredDays -= $attendanceInfo['not_hired_days'] - $attendanceInfo['holidays'];
+								    foreach ($post['month'] as $month) {
+								    	$month = date('Y-m', strtotime($month));
+									    // Attendance information
+									    $attendanceInfo = calculateAttendanceStats($employeeId, $month);
 
-								    if ($requiredDays <= 0) {
-								        continue; // Skip to the next employee if no required days
-								    }
+									    $months .= $month .", ";
+									    // Calculate required work days in the month
+									    $requiredDays = getWorkdaysInMonth($month, $workDays);
+									    $requiredDays -= $attendanceInfo['not_hired_days'] - $attendanceInfo['holidays'];
 
-								    // Calculate salary per day and per hour
-								    $salaryPerDay = $salary / max($requiredDays, 1); // Avoid division by zero
-								    $salaryPerHour = $salaryPerDay / max($workHours, 1);
+									    if ($requiredDays <= 0) {
+									        continue; // Skip to the next employee if no required days
+									    }
 
-								    // Calculate over and under hours if overtime is enabled
-								    $extraHours = $underHours = 0;
-								    if (return_setting('overtime') === 'Yes') {
-								        $timeSheetInfo = calculateTimeSheetHours($employeeId, $month, $workHours);
-								        $netHours = $timeSheetInfo['net_hours'];
+									    // Calculate salary per day and per hour
+									    $salaryPerDay = $salary / max($requiredDays, 1); // Avoid division by zero
+									    $salaryPerHour = $salaryPerDay / max($workHours, 1);
 
-								        if ($netHours > 0) {
-								            $extraHours = $netHours * $salaryPerHour;
-								        } elseif ($netHours < 0) {
-								            $underHours = abs($netHours) * $salaryPerHour;
-								        }
-								    }
+									    // Calculate over and under hours if overtime is enabled
+									    $extraHours = $underHours = 0;
+									    if (return_setting('overtime') === 'Yes') {
+									        $timeSheetInfo = calculateTimeSheetHours($employeeId, $month, $workHours);
+									        $netHours = $timeSheetInfo['net_hours'];
 
-								    // Calculate earnings
-								    $earnings = calculateEmployeeEarnings($employeeId, $month);
-								    $allowance = $earnings['allowance'] ?? 0;
-								    $bonus = $earnings['bonus'] ?? 0;
-								    $commission = $earnings['commission'] ?? 0;
+									        if ($netHours > 0) {
+									            $extraHours = $netHours * $salaryPerHour;
+									        } elseif ($netHours < 0) {
+									            $underHours = abs($netHours) * $salaryPerHour;
+									        }
+									    }
 
-								    // Calculate deductions
-								    $deductions = calculateEmployeeDeductions($employeeId, $month);
-								    $loan = $deductions['loan'] ?? 0;
-								    $advance = $deductions['advance'] ?? 0;
-								    $deduction = $deductions['deduction'] ?? 0;
+									    // Calculate earnings
+									    $earnings = calculateEmployeeEarnings($employeeId, $month);
+									    $allowance = $earnings['allowance'] ?? 0;
+									    $bonus = $earnings['bonus'] ?? 0;
+									    $commission = $earnings['commission'] ?? 0;
 
-								    // Calculate unpaid days and effective days worked
-								    $unpaidDaysCost = ($attendanceInfo['unpaid_leave_days'] + $attendanceInfo['no_show_days']) * $salaryPerDay;
-								    $daysWorked = $requiredDays - $attendanceInfo['unpaid_leave_days'] - $attendanceInfo['no_show_days']- $attendanceInfo['paid_leave_days'] - $attendanceInfo['sick_days'];
+									    // Calculate deductions
+									    $deductions = calculateEmployeeDeductions($employeeId, $month);
+									    $loan = $deductions['loan'] ?? 0;
+									    $advance = $deductions['advance'] ?? 0;
+									    $deduction = $deductions['deduction'] ?? 0;
 
-								    // Calculate tax and then net salary
-								    $total_earnings = $salary + $allowance + $bonus + $commission + $extraHours - $loan - $advance - $deduction - $underHours - $unpaidDaysCost;
+									    // Calculate unpaid days and effective days worked
+									    $unpaidDaysCost = ($attendanceInfo['unpaid_leave_days'] + $attendanceInfo['no_show_days']) * $salaryPerDay;
+									    $daysWorked = $requiredDays - $attendanceInfo['unpaid_leave_days'] - $attendanceInfo['no_show_days']- $attendanceInfo['paid_leave_days'] - $attendanceInfo['sick_days'];
 
-								    // Get state tax
-								    $taxRate = getTaxRate($total_earnings, $state_id);
-								    $total_earnings -= $taxRate;
+									    // Calculate tax and then net salary
+									    $total_earnings = $salary + $allowance + $bonus + $commission + $extraHours - $loan - $advance - $deduction - $underHours - $unpaidDaysCost;
 
+									    // Get state tax
+									    $taxRate = getTaxRate($total_earnings, $state_id);
+									    $total_earnings -= $taxRate;
 
-								    // Insert to details table
-								    $detailsData = [
-								    	'payroll_id' => $payroll_id,
-								    	'emp_id' => $employeeId,
-								    	'full_name' => $fullName,
-								    	'staff_no' => $staffNo,
-								    	'email' => $email, 
-								    	'contract_type' => $contractType,
-								    	'job_title' => $position,
-								    	'month' => $month,
-								    	'required_days' => $requiredDays,
-								    	'days_worked' => $daysWorked,
-								    	'base_salary' => $salary,
-								    	'allowance' => $allowance,
-								    	'bonus' => $bonus,
-								    	'extra_hours' => $extraHours,
-								    	'commission' => $commission,
-								    	'tax' => $taxRate,
-								    	'advance' => $advance,
-								    	'loan' => $loan,
-								    	'deductions' => $deduction,
-								    	'unpaid_days' => $unpaidDaysCost,
-								    	'unpaid_hours' => $underHours,
-								    	'bank_name' => $paymentBank,
-								    	'bank_number' => $paymentAccount,
-								    	'added_by' => $_SESSION['user_id']
-								    ];
+									    // Insert to details table
+									    $detailsData = [
+									    	'payroll_id' => $payroll_id,
+									    	'emp_id' => $employeeId,
+									    	'full_name' => $fullName,
+									    	'staff_no' => $staffNo,
+									    	'email' => $email, 
+									    	'contract_type' => $contractType,
+									    	'job_title' => $position,
+									    	'month' => $month,
+									    	'required_days' => $requiredDays,
+									    	'days_worked' => $daysWorked,
+									    	'base_salary' => $salary,
+									    	'allowance' => $allowance,
+									    	'bonus' => $bonus,
+									    	'extra_hours' => $extraHours,
+									    	'commission' => $commission,
+									    	'tax' => $taxRate,
+									    	'advance' => $advance,
+									    	'loan' => $loan,
+									    	'deductions' => $deduction,
+									    	'unpaid_days' => $unpaidDaysCost,
+									    	'unpaid_hours' => $underHours,
+									    	'bank_name' => $paymentBank,
+									    	'bank_number' => $paymentAccount,
+									    	'added_by' => $_SESSION['user_id']
+									    ];
 
-								    $payrollDetailsClass->create($detailsData);
+									    $payrollDetailsClass->create($detailsData);
+									}
 
 								}
+
+								$months = rtrim($months, ", "); 
+								$array = explode(", ", $months);
+								$unique_months = array_unique($array);
+								$months = implode(", ", $unique_months);
+								$months = rtrim($months, ", "); 
+								$updatemonths = array(
+							        'month' => $months, 
+							    );
+
+								$payrollClass->update($payroll_id, $updatemonths);
 
 				    		} else {
 				    			throw new Exception("No employees were found.");
 				    		}
-
-				    		$payrollClass->update_payrollRelatedTables($month, $payroll_id); 
 				    	}
-				    } 
+				    }
 
 				    $GLOBALS['conn']->commit();
 
-
-				    // If the branch is created successfully, return a success message
-				    if($result['id']) {
+				    // If the payroll is created successfully, return a success message
+				    if($payroll_id) {
 				        $result['msg'] = 'Payroll recorded successfully';
 				        $result['error'] = false;
 				    } else {
 				        $result['msg'] = 'Something went wrong, please try again';
 				        $result['error'] = true;
 				    }
-
 				} catch (Exception $e) {
 				    // Catch any exceptions from the create method and return an error message
 				    $GLOBALS['conn']->rollback();
@@ -542,6 +541,19 @@ if(isset($_GET['action'])) {
 
 				// Return the result as a JSON response
 				echo json_encode($result);
+			} else if($_GET['endpoint'] == 'columns4CustomizeTable') {
+				$table = isset($_POST['table']) ? $_POST['table'] : '';
+				$columns = isset($_POST['columns']) ? $_POST['columns'] : '';
+
+				$columns = implode(",", $columns);
+
+				$update = "UPDATE `table_customize` SET `show_columns` = ? WHERE `dt_table` = ?";
+			   	$updateStmt = $conn->prepare($update);
+			    $updateStmt->bind_param("ss", $columns, $table);
+			    $updateStmt->execute();
+
+			    echo 'updated'; exit();
+
 			}
 		}
 
@@ -647,9 +659,14 @@ if(isset($_GET['action'])) {
 			    if ($payroll->num_rows > 0) {
 			        while ($row = $payroll->fetch_assoc()) {
 			        	$id = $row['id'];
+			        	$month = $row['month'];
+
+			        	$month = formatYearMonths($month);
+			        	$row['month'] = $month;
 			        	$employee_count = 0;
 
-			        	$query = "SELECT COUNT(emp_id) AS employee_count FROM `payroll_details` WHERE `payroll_id` = ?";
+			        	// $query = "SELECT COUNT(emp_id) AS employee_count FROM `payroll_details` WHERE `payroll_id` = ? GROUP BY `emp_id`";
+			        	$query = "SELECT COUNT(DISTINCT emp_id) AS employee_count FROM `payroll_details` WHERE `payroll_id` = ?";
 				        $stmt = $GLOBALS['conn']->prepare($query);
 				        $stmt->bind_param("i", $id);
 				        $stmt->execute();
@@ -670,6 +687,7 @@ if(isset($_GET['action'])) {
 			    }
 			} else if ($_GET['endpoint'] === 'payroll_details') {
 				$payroll_id = isset($_POST['payroll_id']) ? $_POST['payroll_id'] : 0;
+				$month = isset($_POST['month']) ? $_POST['month'] : '';
 				if(isset($_POST['payroll_id'])) $payroll_id = $_POST['payroll_id'];
 				if (isset($_POST['order']) && isset($_POST['order'][0])) {
 				    $orderColumnMap = ['staff_no', 'full_name', 'base_salary', 'earnings', 'total_deductions', 'tax', 'net_salary'];
@@ -678,7 +696,7 @@ if(isset($_GET['action'])) {
 				    $order = strtoupper($_POST['order'][0]['dir']) === 'DESC' ? 'DESC' : 'ASC';
 				}
 			    // Base query
-			    $query = "SELECT  `id`, `payroll_id`, `emp_id`, `staff_no`, `full_name`, `status`, `base_salary`, (`allowance` + `bonus` + `commission`) AS earnings, (`loan` + `advance` + `deductions`) AS `total_deductions`, `tax`, (`base_salary` + (`allowance` + `bonus` + `commission`) - (`loan` + `advance` + `deductions`) - `tax`) AS net_salary FROM `payroll_details` WHERE `payroll_id`  = $payroll_id";
+			    $query = "SELECT  `id`, `payroll_id`, `emp_id`, `staff_no`, `full_name`, `email`, `contract_type`, `job_title`, `month`, `required_days`, `days_worked`, `unpaid_days`, `unpaid_hours`, `bank_name`, `bank_number`, `pay_date`, `paid_by`,  `status`, `base_salary`, (`allowance` + `bonus` + `commission`) AS earnings, (`loan` + `advance` + `deductions`) AS `total_deductions`, `tax`, (`base_salary` + (`allowance` + `bonus` + `commission`) - (`loan` + `advance` + `deductions`) - `tax`) AS net_salary FROM `payroll_details` WHERE `payroll_id`  = $payroll_id AND `month` LIKE '$month'";
 
 			    // Add search functionality
 			    if ($searchParam) {
@@ -697,6 +715,9 @@ if(isset($_GET['action'])) {
 			        $countQuery .= " AND (`full_name` LIKE '%" . escapeStr($searchParam) . "%' OR `staff_no` LIKE '%" . escapeStr($searchParam) . "%'  )";
 			    }
 
+
+
+
 			    // Execute count query
 			    $totalRecordsResult = $GLOBALS['conn']->query($countQuery);
 			    $totalRecords = $totalRecordsResult->fetch_assoc()['total'];
@@ -704,6 +725,9 @@ if(isset($_GET['action'])) {
 			    if ($payroll_details->num_rows > 0) {
 			        while ($row = $payroll_details->fetch_assoc()) {
 			        	$emp_id = $row['emp_id'];
+			        	$paid_by = $row['paid_by'];
+			        	$month 	= $row['month'];
+			        	$month 	= date('F Y', strtotime($month));
 			        	$net_salary = $row['net_salary'];
 			        	$employeeInfo = get_data('employees', ['employee_id' => $emp_id]);
 			        	$taxPercentage = '';
@@ -712,7 +736,14 @@ if(isset($_GET['action'])) {
 			        		$state_id = $employeeInfo['state_id'];
 			        		$taxPercentage = getTaxPercentage($net_salary, $state_id);
 			        	}
+
+			        	$paid_by = $userClass->get_emp($paid_by);
+			        	if(count($paid_by) > 0) $paid_by = $paid_by['full_name'];
+
+
 			        	$row['taxRate'] = $taxPercentage;
+			        	$row['paid_by'] = $paid_by;
+			        	$row['month'] = $month;
 			            $result['data'][] = $row;
 			        }
 			        $result['iTotalRecords'] = $totalRecords;
@@ -722,6 +753,7 @@ if(isset($_GET['action'])) {
 			        $result['msg'] = "No records found";
 			    }
 			}
+
 
 			echo json_encode($result);
 
@@ -734,6 +766,16 @@ if(isset($_GET['action'])) {
 		else if($_GET['action'] == 'get') {
 			if ($_GET['endpoint'] === 'transaction') {
 				json(get_data('employee_transactions', array('transaction_id' => $_POST['id']))[0]);
+			} else if ($_GET['endpoint'] === 'transSubTypes') {
+				$data = '<option value="">None</option>';
+				$type = $_POST['type'];
+				$sql = $GLOBALS['conn']->query("SELECT * FROM `trans_subtypes` WHERE `type` = '$type'");
+				if($sql->num_rows > 0) {
+					while($row = $sql->fetch_assoc()) {
+						$data .= '<option value="'.$row['name'].'">'.$row['name'].'</option>';
+					}
+				}
+				echo $data;
 			} else if ($_GET['endpoint'] === 'downloadTransactionsCSV') {
 				$post = escapePostData($_POST);
 				$ref_id = isset($post['ref_id']) ? $post['ref_id'] : '';
@@ -796,10 +838,10 @@ if(isset($_GET['action'])) {
 
 	    		echo json_encode($result);
 			} else if ($_GET['endpoint'] === '4payslipShow') {
-				$payrollDetId = $_POST['id'];
+				$payroll_id = $_POST['id'];
 				$data = '';
 
-				$query = $GLOBALS['conn']->query("SELECT * FROM `payroll_details` WHERE `id` = '$payrollDetId'");
+				$query = $GLOBALS['conn']->query("SELECT * FROM `payroll_details` WHERE `id` = '$payroll_id'");
 				if($query) {
 					while($row = $query->fetch_assoc()) {
 						$full_name = $row['full_name'];
@@ -949,6 +991,27 @@ if(isset($_GET['action'])) {
 				            </div>
 				        </form>';
 					}
+				}
+
+				echo $data;		
+			} else if ($_GET['endpoint'] === 'allColumns4CustomizeTable') {
+				$table = isset($_POST['table']) ? $_POST['table'] : '';
+				$allColumns = get_columns($table, 'all_columns');
+				$showColumns = get_columns($table, 'show_columns');
+				$data = '';
+				foreach ($allColumns as $col) {
+					$checked = '';
+					if(in_array($col, $showColumns)) $checked = 'checked=""';
+
+					$colTxt = ucwords(strtolower(str_replace("_", " ", $col)));
+					$data .= '<div class="col-sm-6">
+                		<div class="form-check cursor">
+							<input class="form-check-input cursor custom-col" '.$checked.' value="'.$col.'" type="checkbox" value="" id="custom-col-'.$col.'">
+							<label class="form-check-label cursor" for="custom-col-'.$col.'">
+							'.$colTxt.'
+							</label>
+						</div>
+                	</div>';
 				}
 
 				echo $data;

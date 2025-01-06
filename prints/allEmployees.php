@@ -35,8 +35,8 @@ $pdf->SetAutoPageBreak(TRUE, 15);
 $pdf->AddPage();
 
 $pdf->SetFont('aefurat', '', 12);
-$pdf->Image('./assets/images/banner.png', 0, 0, 280, 40); // Adjust size as needed
-
+// $pdf->Image('./assets/images/banner.png', 0, 0, 280, 40); // Adjust size as needed
+$pdf->Image('./assets/images/logo.png', 125, 10, 40);
 // Set header rectangle
 $pdf->SetFillColor(80, 184, 72);
 $pdf->SetDrawColor(80, 184, 72);

@@ -153,7 +153,9 @@ table.dataTable a {
 .relative {
 	position: relative;
 }
-
+.hidden {
+	display: none !important;
+}
 
 
 

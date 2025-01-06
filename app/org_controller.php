@@ -347,6 +347,40 @@ if(isset($_GET['action'])) {
 
 				// Return the result as a JSON response (for example in an API)
 				echo json_encode($result);
+			} else if($_GET['endpoint'] == 'subtype') {
+				try {
+				    // Prepare data from POST request
+				    $post = escapePostData($_POST);
+				    $data = array(
+				        'name' => $post['name'], 
+				        'type' => $post['type'], 
+				        'added_by' => $_SESSION['user_id']
+				    );
+
+				    check_exists('trans_subtypes', ['name' => $post['name']]);
+				    check_auth('manage_employee_transactions');
+
+				    // Call the create method
+				    $result['id'] = $transSubTypesClass->create($data);
+
+				    // If the branch is created successfully, return a success message
+				    if($result['id']) {
+				        $result['msg'] = 'Transaction subtype created successfully';
+				        $result['error'] = false;
+				    } else {
+				        $result['msg'] = 'Something went wrong, please try again';
+				        $result['error'] = true;
+				    }
+
+				} catch (Exception $e) {
+				    // Catch any exceptions from the create method and return an error message
+				    $result['msg'] = 'Error: Something went wrong';
+				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
+				    $result['error'] = true;
+				}
+
+				// Return the result as a JSON response (for example in an API)
+				echo json_encode($result);
 			}
 
 			exit();
@@ -702,6 +736,42 @@ if(isset($_GET['action'])) {
 				    // If the branch is editted successfully, return a success message
 				    if($result['id']) {
 				        $result['msg'] = 'Bank info editted successfully';
+				        $result['error'] = false;
+				    } else {
+				        $result['msg'] = 'Something went wrong, please try again';
+				        $result['error'] = true;
+				    }
+
+				} catch (Exception $e) {
+				    // Catch any exceptions from the create method and return an error message
+				    $result['msg'] = 'Error: Something went wrong';
+				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
+				    $result['error'] = true;
+				}
+
+				// Return the result as a JSON response (for example in an API)
+				echo json_encode($result);
+			} else if($_GET['endpoint'] == 'subtype') {
+				try {
+				    // Prepare data from POST request
+				    $post = escapePostData($_POST);
+				    $data = array(
+				        'name' => $post['name'], 
+				        'type' => $post['type'], 
+				        'status' => isset($post['slcStatus']) ? $post['slcStatus']: "Active" ,
+				        'updated_by' => $_SESSION['user_id'],
+				        'updated_date' => $updated_date
+				    );
+
+				    check_exists('trans_subtypes', ['name' => $post['name']], ['id' => $post['id']]);
+				    check_auth('manage_employee_transactions');
+
+				    // Call the create method
+				    $result['id'] = $transSubTypesClass->update($post['id'], $data);
+
+				    // If the branch is editted successfully, return a success message
+				    if($result['id']) {
+				        $result['msg'] = 'Subtype info editted successfully';
 				        $result['error'] = false;
 				    } else {
 				        $result['msg'] = 'Something went wrong, please try again';
@@ -1156,6 +1226,47 @@ if(isset($_GET['action'])) {
 			    } else {
 			        $result['msg'] = "No records found";
 			    }
+			} else if ($_GET['endpoint'] === 'subtypes') {
+				if (isset($_POST['order']) && isset($_POST['order'][0])) {
+				    $orderColumnMap = ['name'];
+				    $orderByIndex = (int)$_POST['order'][0]['column'];
+				    $orderBy = $orderColumnMap[$orderByIndex] ?? $orderBy;
+				    $order = strtoupper($_POST['order'][0]['dir']) === 'DESC' ? 'DESC' : 'ASC';
+				}
+			    // Base query
+			    $query = "SELECT * FROM `trans_subtypes` WHERE `id` IS NOT NULL";
+
+			    // Add search functionality
+			    if ($searchParam) {
+			        $query .= " AND (`name` LIKE '%" . escapeStr($searchParam) . "%' OR `type` LIKE '%" . escapeStr($searchParam) . "%')";
+			    }
+
+			    // Add ordering
+			    $query .= " ORDER BY `$orderBy` $order LIMIT $start, $length";
+
+			    // Execute query
+			    $trans_subtypes = $GLOBALS['conn']->query($query);
+
+			    // Count total records for pagination
+			    $countQuery = "SELECT COUNT(*) as total FROM `trans_subtypes` WHERE `id` IS NOT NULL";
+			    if ($searchParam) {
+			        $query .= " AND (`name` LIKE '%" . escapeStr($searchParam) . "%')";
+			    }
+
+			    // Execute count query
+			    $totalRecordsResult = $GLOBALS['conn']->query($countQuery);
+			    $totalRecords = $totalRecordsResult->fetch_assoc()['total'];
+
+			    if ($trans_subtypes->num_rows > 0) {
+			        while ($row = $trans_subtypes->fetch_assoc()) {
+			            $result['data'][] = $row;
+			        }
+			        $result['iTotalRecords'] = $totalRecords;
+			        $result['iTotalDisplayRecords'] = $totalRecords;
+			        $result['msg'] = $trans_subtypes->num_rows . " records were found.";
+			    } else {
+			        $result['msg'] = "No records found";
+			    }
 			}
 
 			echo json_encode($result);
@@ -1220,6 +1331,8 @@ if(isset($_GET['action'])) {
 				json(get_data('budget_codes', array('id' => $_POST['id'])));
 			} else if ($_GET['endpoint'] === 'bank') {
 				json(get_data('banks', array('id' => $_POST['id'])));
+			} else if ($_GET['endpoint'] === 'subtype') {
+				json(get_data('trans_subtypes', array('id' => $_POST['id'])));
 			}
 
 			exit();
@@ -1466,6 +1579,31 @@ if(isset($_GET['action'])) {
 				    // Company deleted
 				    if($deleted) {
 				        $result['msg'] = 'Budget code has been  deleted successfully';
+				        $result['error'] = false;
+				    } else {
+				        $result['msg'] = 'Something went wrong, please try again';
+				        $result['error'] = true;
+				    }
+
+				} catch (Exception $e) {
+				    // Catch any exceptions from the create method and return an error message
+				    $result['msg'] = 'Error: Something went wrong';
+				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
+				    $result['error'] = true;
+				}
+
+				// Return the result as a JSON response (for example in an API)
+				echo json_encode($result);
+			} else if ($_GET['endpoint'] === 'subtype') {
+				try {
+				    // Delete branchClass
+				    $post = escapePostData($_POST);
+				    check_auth('manage_employee_transactions');
+				    $deleted = $transSubTypesClass->delete($post['id']);
+
+				    // Company deleted
+				    if($deleted) {
+				        $result['msg'] = 'Subtype has been  deleted successfully';
 				        $result['error'] = false;
 				    } else {
 				        $result['msg'] = 'Something went wrong, please try again';

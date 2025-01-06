@@ -595,7 +595,20 @@ function getTaxPercentage(float $amount, int $stateId): float {
 }
 
 
+// Table customize
+function get_columns($table, $reqColumns = 'show_columns') {
+    $defaultColumns = '';
+    if($table == 'showpayrollDT') $defaultColumns = "staff_no, full_name, base_salary, earnings, deductions, tax, net_salary, status, action";
+    $query = $GLOBALS['conn']->query("SELECT * FROM `table_customize` WHERE `dt_table` = '$table'");
+    if($query->num_rows > 0) {
+        $columns = $query->fetch_assoc()[$reqColumns];
+        if(!$columns) $columns = $defaultColumns;
+        $columns = str_replace(" ", "", $columns);
+        $columns = explode(",", $columns);
+    }
 
+    return $columns;
+}
 
 
 

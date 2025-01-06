@@ -144,14 +144,14 @@ function handleTransactions() {
 	    if(data) {
 	    	let res = JSON.parse(data);
 	    	console.log(res)
-	    	$(modal).find('#transaction_id').val(id);
+	    	/*$(modal).find('#transaction_id').val(id);
 	    	$(modal).find('#employee_name').val(`${res.full_name}, ${res.phone_number}`);
 	    	$(modal).find('#transType4Edit').val(res.transaction_type);
 	    	$(modal).find('#transSubType4Edit').val(res.transaction_subtype);
 	    	$(modal).find('#transAmount4Edit').val(res.amount);
 	    	$(modal).find('#transStatus4Edit').val(res.status);
 	    	$(modal).find('#transDate4Edit').val(res.date);
-	    	$(modal).find('#txtComments4Edit').val(res.description);
+	    	$(modal).find('#txtComments4Edit').val(res.description);*/
 
 	    }
 
@@ -214,6 +214,24 @@ function handleTransactions() {
 	$('#transaction_uploadForm').on('submit', (e) => {
 		handle_transaction_uploadForm(e.target);
 		return false
+	})
+
+	$(document).on('change', '#transType', async (e) => {
+		let type = $(e.target).val();
+		if(type) {
+			let data = {type};
+			let response = await send_payrollPost('get transSubTypes', data);
+			$('#transSubType').html(response)
+		}
+	})
+
+	$(document).on('change', '#transType4Edit', async (e) => {
+		let type = $(e.target).val();
+		if(type) {
+			let data = {type};
+			let response = await send_payrollPost('get transSubTypes', data);
+			$('#transSubType4Edit').html(response)
+		}
 	})
 }
 
@@ -476,7 +494,7 @@ function load_payroll() {
 
 	        { title: `Month `, data: null, render: function(data, type, row) {
 	            return `<div>
-	            		<span>${formatDate(row.month, 'month_name', false)}</span>
+	            		<span>${row.month}</span>
 	                </div>`;
 	        }},
 
@@ -512,9 +530,9 @@ function load_payroll() {
 }
 
 // Payroll
-function load_showPayroll() {
+function load_showPayroll(payroll_id, month) {
 	function set_actions(row) {
-		let actions = `<a title="View payslip" data-recid="${row.id}" class="fa show_payslip smt-5 cursor smr-10 fa-eye"></a>`;
+		let actions = `<a title="View payslip" data-recid="${row.id}" data-emp_id="${row.emp_id}" class="fa show_payslip smt-5 cursor smr-10 fa-eye"></a>`;
 		if(row.status == 'Pending') {
 			actions += `<a title="Approve payroll" data-recid="${row.payroll_id}" data-emp_id="${row.emp_id}" class="fa approve_payrollBtn smt-5 cursor smr-10 fa-check"></a>`;
 		} else if(row.status == 'Approved') {
@@ -542,6 +560,7 @@ function load_showPayroll() {
 	        "method": "POST",
 	        "data": {
 	            "payroll_id": payroll_id,
+	            "month": month,
 	        },
 		    /*dataFilter: function(data) {
 				console.log(data)
@@ -551,59 +570,133 @@ function load_showPayroll() {
 	    "createdRow": function(row, data, dataIndex) { 
 	    	// Add your custom class to the row 
 	    	// $(row).addClass('table-row ' +data.status.toLowerCase());
+	    	// $('#showpayrollDT_wrapper').find('td').css('display', 'none')
+	    	//
+
+	    	tableColumns.map((column) => {
+	    		// $('#showpayrollDT_wrapper').find('td.'+column).css('display', 'flex')
+	    		// $('#showpayrollDT_wrapper').find('th.'+column).css('display', 'flex')
+	    	})
+	    },
+	    "drawCallback": function(settings) {
+	    	$('#showpayrollDT_wrapper').find('td').css('display', 'none');
+	    	 $('#showpayrollDT_wrapper').find('th').css('display', 'none')
+	    	 tableColumns.map((column) => {
+	    		$('#showpayrollDT_wrapper').find('td.'+column).css('display', 'table-cell')
+	    		$('#showpayrollDT_wrapper').find('th.'+column).css('display', 'table-cell')
+	    	})
 	    },
 	    columns: [
 
-	    	{ title: `Staff No. `, data: null, render: function(data, type, row) {
-	            return `<div>
+	    	{ title: `Staff No. `, data: null,  className: "staff_no", render: function(data, type, row) {
+	            return `<div> 
 	            		<span>${row.staff_no} </span>
 	                </div>`;
 	        }},
 
-	        { title: `Full name `, data: null, render: function(data, type, row) {
+	        { title: `Full name `, data: null, className: "full_name", render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.full_name} </span>
 	                </div>`;
 	        }},
 
-	        { title: `Gross salary `, data: null, render: function(data, type, row) {
+	        { title: `Email `, data: null,  className: "email", render: function(data, type, row) {
+	            return `<div> 
+	            		<span>${row.email} </span>
+	                </div>`;
+	        }},
+
+	        { title: `Contract type `, data: null,  className: "contract_type", render: function(data, type, row) {
+	            return `<div> 
+	            		<span>${row.contract_type} </span>
+	                </div>`;
+	        }},
+
+	        { title: `Job title `, data: null,  className: "job_title", render: function(data, type, row) {
+	            return `<div> 
+	            		<span>${row.job_title} </span>
+	                </div>`;
+	        }},
+
+	        { title: `Month `, data: null,  className: "month", render: function(data, type, row) {
+	            return `<div> 
+	            		<span>${row.month} </span>
+	                </div>`;
+	        }},
+
+	         { title: `Required days `, data: null,  className: "required_days", render: function(data, type, row) {
+	            return `<div> 
+	            		<span>${row.required_days} </span>
+	                </div>`;
+	        }},
+
+	        { title: `Days worked `, data: null,  className: "days_worked", render: function(data, type, row) {
+	            return `<div> 
+	            		<span>${row.days_worked} </span>
+	                </div>`;
+	        }},
+
+	        { title: `Unpaid days `, data: null,  className: "unpaid_days", render: function(data, type, row) {
+	            return `<div> 
+	            		<span>${row.unpaid_days} </span>
+	                </div>`;
+	        }},
+
+	        { title: `Unpaid hours `, data: null,  className: "unpaid_hours", render: function(data, type, row) {
+	            return `<div> 
+	            		<span>${row.unpaid_hours} </span>
+	                </div>`;
+	        }},
+
+	        { title: `Gross salary `, data: null, className: "gross_salary", render: function(data, type, row) {
 	            return `<div>
 	            		<span>${formatMoney(row.base_salary)} </span>
 	                </div>`;
 	        }},
 
-	        { title: `Earnings `, data: null, render: function(data, type, row) {
+	        { title: `Earnings `, data: null, className: "earnings", render: function(data, type, row) {
 	            return `<div>
 	            		<span>${formatMoney(row.earnings)} </span>
 	                </div>`;
 	        }},
 
-	        { title: `Deductions `, data: null, render: function(data, type, row) {
+	        { title: `Deductions `, data: null, className: "total_deductions", render: function(data, type, row) {
 	            return `<div>
 	            		<span>${formatMoney(row.total_deductions)} </span>
 	                </div>`;
 	        }},
 
-	        { title: `Tax `, data: null, render: function(data, type, row) {
+	        { title: `Tax `, data: null, className: "tax", render: function(data, type, row) {
 	            return `<div>
 	            		<span>${formatMoney(row.tax)} -  (${row.taxRate}%)</span>
 	                </div>`;
 	        }},
 
-	        { title: `Net salary `, data: null, render: function(data, type, row) {
+	        { title: `Net salary `, data: null, className: "net_salary", render: function(data, type, row) {
 	            return `<div>
 	            		<span>${formatMoney(row.net_salary)} </span>
 	                </div>`;
 	        }},
 
-	        { title: `Status `, data: null, render: function(data, type, row) {
+	        { title: `Status `, data: null, className: "status", render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.status} </span>
 	                </div>`;
 	        }},
 
+	        { title: `Bank name `, data: null,  className: "bank_name", render: function(data, type, row) {
+	            return `<div> 
+	            		<span>${row.bank_name} </span>
+	                </div>`;
+	        }},
 
-	        { title: "Action", data: null, render: function(data, type, row) {
+	        { title: `Account number `, data: null,  className: "bank_number", render: function(data, type, row) {
+	            return `<div> 
+	            		<span>${row.bank_number} </span>
+	                </div>`;
+	        }},
+
+	        { title: "Action", data: null, className: "action", render: function(data, type, row) {
 	            return `<div class="sflex scenter-items">
             		${set_actions(row)}
                 </div>`;
@@ -658,10 +751,24 @@ function handlePayroll() {
 	    if(data) {
 	    	let res = JSON.parse(data);
 	    	console.log(res)
-	    	$(modal).find('#transaction_id').val(id);
+	    	/*$(modal).find('#transaction_id').val(id);
 	    	$(modal).find('#employee_name').val(`${res.full_name}, ${res.phone_number}`);
 	    	$(modal).find('#transType4Edit').val(res.transaction_type);
 	    	$(modal).find('#transSubType4Edit').val(res.transaction_subtype);
+	    	$(modal).find('#transAmount4Edit').val(res.amount);
+	    	$(modal).find('#transStatus4Edit').val(res.status);
+	    	$(modal).find('#transDate4Edit').val(res.date);
+	    	$(modal).find('#txtComments4Edit').val(res.description);*/
+
+	    	$(modal).find('#transSubType4Edit').html(`<option value="">None</option>`)
+	    	$(modal).find('#transaction_id').val(id);
+	    	$(modal).find('#employee_name').val(`${res.full_name}, ${res.phone_number}`);
+	    	$(modal).find('#transType4Edit').val(res.transaction_type);
+	    	$(modal).find('#transType4Edit').trigger('change')
+	    	setTimeout(() => {
+	    		$(modal).find('#transSubType4Edit').val(res.transaction_subtype);
+	    	}, 200)
+	    	// $(modal).find('#transSubType4Edit').val(res.transaction_subtype);
 	    	$(modal).find('#transAmount4Edit').val(res.amount);
 	    	$(modal).find('#transStatus4Edit').val(res.status);
 	    	$(modal).find('#transDate4Edit').val(res.date);
@@ -673,10 +780,10 @@ function handlePayroll() {
 	});
 
 	// Edit payroll info form
-	$('#editTransactionForm').on('submit', (e) => {
+	/*$('#editTransactionForm').on('submit', (e) => {
 		handle_editTransactionForm(e.target);
 		return false
-	})
+	})*/
 
 	// Delete payroll
 	$(document).on('click', '.delete_payroll', async (e) => {
@@ -861,6 +968,7 @@ function handlePayroll() {
 	// Show payrol details
 	$(document).on('click', '.show_payslip', async (e) => {
 	    let id = $(e.currentTarget).data('recid');
+	    let emp_id = $(e.currentTarget).data('emp_id');
 	    let modal = $('#show_payslip');
 	    let data = await get_4payslipShow(id);
 	    console.log(data)
@@ -873,6 +981,45 @@ function handlePayroll() {
 
 	    $(modal).modal('show');
 	});
+
+
+	// Payroll year change 
+	$('#slcYear').on('change', (e) => {
+		let year = $(e.target).val();
+		const months = {
+		    '01': 'January',
+		    '02': 'February',
+		    '03': 'March',
+		    '04': 'April',
+		    '05': 'May',
+		    '06': 'June',
+		    '07': 'July',
+		    '08': 'August',
+		    '09': 'September',
+		    '10': 'October',
+		    '11': 'November',
+		    '12': 'December'
+		 };
+
+		const selectElement = $('#slctedMonths');
+
+		// Loop through months and create options
+		Object.entries(months).forEach(([monthNum, monthName]) => {
+		    const optionValue = `${year}-${monthNum}`;
+		    const optionText = `${monthName} ${year}`;
+
+		    // Check if option already exists before appending
+		    if (!selectElement.find(`option[value="${optionValue}"]`).length) {
+		      	const newOption = $('<option></option>')
+		        	.val(optionValue)
+		        	.text(optionText);
+		      	selectElement.append(newOption);
+
+		      	$("#slctedMonths").SumoSelect().sumo.reload();
+		    }
+		});
+	});
+
 }
 
 async function handle_generatePayrollForm(form) {
@@ -880,7 +1027,6 @@ async function handle_generatePayrollForm(form) {
     let error = validateForm(form)
     let ref_id, ref_name, err_mgs = '';
     let transFor = $(form).find('#slcTransFor').val();
-    console.log(transFor)
 
     if(transFor != 'All') {
 	    if(transFor == 'Department') {
@@ -898,7 +1044,7 @@ async function handle_generatePayrollForm(form) {
 	    }
 	}
 
-    let month = $(form).find('#payrollMonth').val();
+    let month = $(form).find('#slctedMonths').val();
 
     if (error) return false;
 
@@ -1008,5 +1154,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		    }
 		}
     })
+
+    
 });
 

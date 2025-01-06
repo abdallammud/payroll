@@ -218,25 +218,25 @@ function load_employees(department = '', state = '', location = '', status = '')
 	                </div>`;
 	        }},
 
-	        { title: `Emai;`, data: null, render: function(data, type, row) {
+	        { title: `Emai`, data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.email}</span>
 	                </div>`;
 	        }},
 
-	        { title: `Position;`, data: null, render: function(data, type, row) {
+	        { title: `Position`, data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.position}</span>
 	                </div>`;
 	        }},
 
-	       { title: `Hire date;`, data: null, render: function(data, type, row) {
+	       { title: `Hire date`, data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${formatDate(row.hire_date)}</span>
 	                </div>`;
 	        }},
 
-	        { title: `Salary;`, data: null, render: function(data, type, row) {
+	        { title: `Salary`, data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${formatMoney(row.salary)}</span>
 	                </div>`;

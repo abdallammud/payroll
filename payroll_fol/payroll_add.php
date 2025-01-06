@@ -25,22 +25,35 @@
                     </div>
                     <div class="row">
                         <div class="col col-xs-12">
-                            <div class="form-group attenForDiv">
-                               
-                            </select>
+                            <div class="form-group  attenForDiv">
+                                
                             </div>
                         </div>
                     </div>
                    
                     <div class="row">
                         <div class="col col-xs-12">
-                            <div class="form-group">
-                                <label class="label required" for="payrollMonth">Month</label>
-                                <input type="month" class="form-control cursor validate" data-msg="Please select month" id="payrollMonth"  name="payrollMonth">
-                                <span class="form-error text-danger">This is error</span>
+                            <label class="label required" for="slcYear">Payroll Period</label>
+                            <div class="form-group sflex">
+                                <select type="text"  class="form-control sflex-basis-26 smr-15  slcYear" name="slcYear" id="slcYear">
+                                    <?php
+                                        for ($year = 2025; $year >= 2015; $year--) { 
+                                          echo "<option value=\"{$year}\">{$year}</option>";
+                                        }
+                                    ?>
+                                </select>
+                                <select name="" class="SlectBox" multiple="multiple" id="slctedMonths">
+                                    <?php 
+                                    $months = array('01' => 'January','02' => 'February','03' => 'March','04' => 'April','05' => 'May','06' => 'June','07' => 'July','08' => 'August','09' => 'September','10' => 'October','11' => 'November','12' => 'December');
+                                    $currentYear = date('Y');
+                                    foreach ($months as $monthNum => $monthName) {
+                                        $selected = $monthNum == date("m") ? 'selected' : ''; // Adjust array as needed
+                                        echo "<option value=\"{$currentYear}-{$monthNum}\" {$selected}>{$monthName} {$currentYear}</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
                         </div>
-                        
                     </div>
                     
                 </div>
@@ -53,3 +66,47 @@
         </form>
     </div>
 </div>
+
+<style type="text/css">
+    .SumoSelect > .CaptionCont {
+        background: var(--bs-body-bg-2);;
+    }
+    .main-wrapper .main-content .options {
+        display: flex;
+        align-items: center;
+        color: #494949;
+        border-radius: 0%; 
+        transition: all 0.3s;
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        height: fit-content;
+        background: var(--bs-body-bg-2);;
+    }
+
+    .main-wrapper .main-content .options li {
+        flex-basis: 100%;
+    }
+
+    .main-wrapper .main-content .options li.opt {
+        border-bottom: var(--bs-border-width) solid var(--bs-border-color);
+    }
+    .main-wrapper .main-content .options li.opt:hover {
+        background: var(--bs-body-bg-2);
+        opacity: .7;
+    }
+
+    .SumoSelect {
+        /* width: 98%; */
+        flex-basis: 70%;
+        border-radius: 5px;
+    }
+    .SumoSelect > .CaptionCont {
+        border: var(--bs-border-width) solid var(--bs-border-color);
+        border-radius: 5px;
+    } 
+
+    .SumoSelect > .optWrapper.multiple > .options li.opt.selected span i, .SumoSelect .select-all.selected > span i, .SumoSelect .select-all.partial > span i {
+        background-color: #2e80f9;
+    }
+</style>

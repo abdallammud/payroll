@@ -43,9 +43,11 @@ class Users extends Model {
     public function get_emp($emp_id) {
         $conn = $GLOBALS['conn'];
         $return = [];
-        $query = $conn->query("SELECT * FROM `employees` WHERE `employee_id` = $emp_id");
-        if($query->num_rows > 0) {
-            $return = $query->fetch_assoc();
+        if($emp_id) {
+            $query = $conn->query("SELECT * FROM `employees` WHERE `employee_id` = $emp_id");
+            if($query->num_rows > 0) {
+                $return = $query->fetch_assoc();
+            }
         }
 
         return $return;;

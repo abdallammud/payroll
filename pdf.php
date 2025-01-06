@@ -13,8 +13,8 @@ if(isset($_GET['print'])) {
 		require('prints/payslip.php');
 	} else if($_GET['print'] == 'employees') {
 		require('prints/allEmployees.php');
-	} else if($_GET['print'] == 'book_transactions') {
-		require('prints/book_transactions.php');
+	} else if($_GET['print'] == 'attendance') {
+		require('prints/attendance.php');
 	} else if($_GET['print'] == 'customer_transactions') {
 		require('prints/customer_transactions.php');
 	} else if($_GET['print'] == 'booksCheckedout') {

@@ -55,7 +55,10 @@
                         <div class="col col-xs-12">
                             <div class="form-group">
                                 <label class="label required" for="transSubType">Transaction subtype</label>
-                                <input type="text" name="transSubType" class="form-control " id="transSubType" />
+                                <!-- <input type="text" name="transSubType" class="form-control " id="transSubType" /> -->
+                                <select  class="form-control " id="transSubType" name="transSubType">
+                                    <option value="">None</option>
+                                </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>

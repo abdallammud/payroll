@@ -2100,7 +2100,7 @@ async function get_budgetCode(id) {
 	return response;
 }
 
-// Budget codes
+// Budget all banks
 function load_allBanks() {
 	var datatable = $('#allBanksDT').DataTable({
 		// let datatable = new DataTable('#companyDT', {
@@ -2302,6 +2302,217 @@ async function get_bank(id) {
 }
 
 
+// Budget subtypes
+function load_transSubTypes() {
+	var datatable = $('#subTypesDT').DataTable({
+		// let datatable = new DataTable('#companyDT', {
+	    "processing": true,
+	    "serverSide": true,
+	    "bDestroy": true,
+	    "searching": false,  
+	    "info": false,
+	    "columnDefs": [
+	        { "orderable": false, "searchable": false,  "targets": [1] }  // Disable search on first and last columns
+	    ],
+	    "serverMethod": 'post',
+	    "ajax": {
+	        "url": "./app/org_controller.php?action=load&endpoint=subtypes",
+	        "method": "POST",
+		    /*dataFilter: function(data) {
+				console.log(data)
+			}*/
+	    },
+	    
+	    "createdRow": function(row, data, dataIndex) { 
+	    	// Add your custom class to the row 
+	    	$(row).addClass('table-row ' +data.status.toLowerCase());
+	    },
+	    columns: [
+	        { title: `Type`, data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.type}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Name`, data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.name}</span>
+	                </div>`;
+	        }},
+
+	        { title: "Action", data: null, render: function(data, type, row) {
+	            return `<div class="sflex scenter-items">
+            		<span data-recid="${row.id}" class="fa edit_subTypesInfo smt-5 cursor smr-10 fa-pencil"></span>
+            		<span data-recid="${row.id}" class="fa delete_subType smt-5 cursor fa-trash"></span>
+                </div>`;
+	        }},
+	    ]
+	});
+
+	return false;
+}
+
+function handleSubTypes() {
+	$('#addSubtype').on('submit', (e) => {
+		handle_addSubtype(e.target);
+		return false
+	})
+
+	load_transSubTypes();
+
+	// Edit location
+	$(document).on('click', '.edit_subTypesInfo', async (e) => {
+	    let id = $(e.currentTarget).data('recid');
+	    let modal = $('#edit_subtype');
+
+	    let data = await get_subtype(id);
+	    console.log(data)
+	    if(data) {
+	    	let res = JSON.parse(data)[0];
+	    	console.log(res)
+	    	$(modal).find('#subtype_id').val(id);
+	    	$(modal).find('#subtypeName4Edit').val(res.name);
+	    	$(modal).find('#transType4Edit').val(res.type);
+	    	$(modal).find('#slcStatus').val(res.status);
+	    }
+
+	    $(modal).modal('show');
+	});
+
+	// Edit location info form
+	$('#editSubtype').on('submit', (e) => {
+		handle_editSubtype(e.target);
+		return false
+	})
+
+	// Delete location
+	$(document).on('click', '.delete_subType', async (e) => {
+	    let id = $(e.currentTarget).data('recid');
+	    swal({
+	        title: "Are you sure?",
+	        text: `You are going to delete this record.`,
+	        icon: "warning",
+	        className: 'warning-swal',
+	        buttons: ["Cancel", "Yes, delete"],
+	    }).then(async (confirm) => {
+	        if (confirm) {
+	            let data = { id: id };
+	            try {
+	                let response = await send_orgPost('delete subtype', data);
+	                console.log(response)
+	                if (response) {
+	                    let res = JSON.parse(response);
+	                    if (res.error) {
+	                        toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+	                    } else {
+	                        toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration: 1000 }).then(() => {
+	                            location.reload();
+	                            // load_branches();
+	                        });
+	                        console.log(res);
+	                    }
+	                } else {
+	                    console.log('Failed to edit state.' + response);
+	                }
+
+	            } catch (err) {
+	                console.error('Error occurred during form submission:', err);
+	            }
+	        }
+	    });
+	});
+}
+
+async function handle_addSubtype(form) {
+    clearErrors();
+    let error = validateForm(form)
+
+    let name 	= $(form).find('#subtypeName').val();
+    let type 	= $(form).find('#transType').val();
+
+    if (error) return false;
+
+    let formData = {
+        name: name,
+        type:type
+    };
+
+    form_loading(form);
+
+    try {
+        let response = await send_orgPost('save subtype', formData);
+        console.log(response)
+        if (response) {
+            let res = JSON.parse(response)
+            if(res.error) {
+            	toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+            } else {
+            	toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration:1000 }).then(() => {
+            		location.reload();
+            		// load_budgetCodes();
+            	});
+            	console.log(res)
+            }
+        } else {
+            console.log('Failed to save state.' + response);
+        }
+
+    } catch (err) {
+        console.error('Error occurred during form submission:', err);
+    }
+}
+
+async function handle_editSubtype(form) {
+    clearErrors();
+    let error = validateForm(form)
+
+    console.log(form)
+
+    let id 	= $(form).find('#subtype_id').val();
+   	let name 	= $(form).find('#subtypeName4Edit').val();
+   	let type 	= $(form).find('#transType4Edit').val();
+    let slcStatus 	= $(form).find('#slcStatus').val();
+
+    if (error) return false;
+
+    let formData = {
+    	id:id,
+        name: name,
+        type:type,
+        slcStatus:slcStatus
+    };
+
+    form_loading(form);
+    try {
+        let response = await send_orgPost('update subtype', formData);
+        console.log(response)
+        if (response) {
+            let res = JSON.parse(response)
+            $('#edit_budgetCode').modal('hide');
+            if(res.error) {
+            	toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+            } else {
+            	toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration:1000 }).then(() => {
+            		location.reload();
+            		// load_budgetCodes();
+            	});
+            	console.log(res)
+            }
+        } else {
+            console.log('Failed to save state.' + response);
+        }
+
+    } catch (err) {
+        console.error('Error occurred during form submission:', err);
+    }
+}
+
+async function get_subtype(id) {
+	let data = {id};
+	let response = await send_orgPost('get subtype', data);
+	return response;
+}
+
 
 document.addEventListener("DOMContentLoaded", function() {
 	handleOrg();
@@ -2314,4 +2525,5 @@ document.addEventListener("DOMContentLoaded", function() {
 	handleContractTypes();
 	handleBudgetCodes();
 	handleAllBanks();
+	handleSubTypes();
 });

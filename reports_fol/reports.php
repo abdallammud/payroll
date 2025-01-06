@@ -9,14 +9,14 @@
                         	<option value="">-Select</option>
                             <option value="allEmployees"> All Employees</option>
                             <option value="attendance"> Attendance</option>
-                            <option value="timesheet"> Timesheet</option>
-                            <option value="transactions"> Transactions</option>
+                           	<!--  <option value="timesheet"> Timesheet</option>
+                            <option value="transactions"> Transactions</option> -->
                         </select>
                         <span class="form-error text-danger">This is error</span>
                     </div>
 				</div>
 
-				<div class="col-md-6 col-lg-2">
+				<div class="col-md-6 hidden slcMonthFilter col-lg-2">
 					<div class="form-group">
                         <label class="label required" for="slcMonth">Month</label>
                        	<input type="month" class="form-control validate" value="<?=date('Y-m');?>" id="slcMonth" name="">

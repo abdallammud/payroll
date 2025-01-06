@@ -19,7 +19,7 @@
             </div>
 
             <div class="modal-footer">
-                <a href="<?=baseUri();?>/assets/docs/employee upload sample.csv" download="" class="btn btn-secondary cursor " style="min-width: 100px;">Download sample file.</a>
+                <a href="<?=baseUri();?>/assets/docs/employee upload sample.csv" download="employee upload sample.csv" class="btn btn-secondary cursor " style="min-width: 100px;">Download sample file.</a>
                 <button type="submit" class="btn btn-primary cursor" style="min-width: 100px;">Upload</button>
             </div>
         </form>

@@ -40,7 +40,10 @@
                         <div class="col col-xs-12">
                             <div class="form-group">
                                 <label class="label required" for="transSubType4Edit">Transaction subtype</label>
-                                <input type="text" name="transSubType4Edit" class="form-control " id="transSubType4Edit" />
+                                <!-- <input type="text" name="transSubType4Edit" class="form-control " id="transSubType4Edit" /> -->
+                                <select  class="form-control " id="transSubType4Edit" name="transSubType4Edit">
+                                    <option value="">None</option>
+                                </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>

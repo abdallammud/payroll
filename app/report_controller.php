@@ -186,7 +186,7 @@ if(isset($_GET['action'])) {
 			    $order = strtoupper($_POST['order'][0]['dir']) === 'DESC' ? 'DESC' : 'ASC';
 			}
 		    // Base query
-		    /*$query = "SELECT emp_id, full_name, SUM(CASE WHEN status = 'P' THEN 1 ELSE 0 END) AS present_count, SUM(CASE WHEN status = 'PL' THEN 1 ELSE 0 END) AS paid_leave_count, SUM(CASE WHEN status = 'UPL' THEN 1 ELSE 0 END) AS unpaid_leave_count, SUM(CASE WHEN status = 'NH' THEN 1 ELSE 0 END) AS not_hired_count, SUM(CASE WHEN status = 'H' THEN 1 ELSE 0 END) AS holiday_count, SUM(CASE WHEN status = 'N' THEN 1 ELSE 0 END) AS no_show_count FROM  atten_details  WHERE `atten_date` LIKE '$month%' ";*/
+		    $query = "SELECT emp_id, staff_no, full_name, SUM(CASE WHEN status = 'P' THEN 1 ELSE 0 END) AS present_count, SUM(CASE WHEN status = 'PL' THEN 1 ELSE 0 END) AS paid_leave_count, SUM(CASE WHEN status = 'UPL' THEN 1 ELSE 0 END) AS unpaid_leave_count, SUM(CASE WHEN status = 'NH' THEN 1 ELSE 0 END) AS not_hired_count, SUM(CASE WHEN status = 'H' THEN 1 ELSE 0 END) AS holiday_count, SUM(CASE WHEN status = 'N' THEN 1 ELSE 0 END) AS no_show_count FROM  atten_details  WHERE `atten_date` LIKE '$month%' ";
 
 		    // Add search functionality
 		    if ($searchParam) {
@@ -225,6 +225,8 @@ if(isset($_GET['action'])) {
 		        		$required_days -= $not_hired_count + $holiday_count;
 		        		$worked_days = $required_days - $paid_leave_count - $unpaid_leave_count;
 		        	}
+		        	$row['required_days'] =$required_days;
+		        	$row['worked_days'] =$worked_days;
 		            $result['data'][] = $row;
 		        }
 		        $result['iTotalRecords'] = $totalRecords;

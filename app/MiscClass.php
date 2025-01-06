@@ -41,3 +41,11 @@ class BanksClass extends Model {
 }
 
 $GLOBALS['banksClass'] = $banksClass = new BanksClass();
+
+class TransSubTypesClass extends Model {
+    public function __construct() {
+        parent::__construct('trans_subtypes');
+    }
+}
+
+$GLOBALS['transSubTypesClass'] = $transSubTypesClass = new TransSubTypesClass();

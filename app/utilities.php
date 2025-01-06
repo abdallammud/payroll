@@ -144,5 +144,35 @@ function getWorkdaysInMonth($yearMonth, $workdaysInWeek = 0) {
     return $workdays;
 }
 
+function formatYearMonths($input) {
+    // Split the input string into an array of year-month values
+    $yearMonths = array_map('trim', explode(',', $input));
+    $formatted = [];
+    $currentGroup = [];
+    $lastYear = null;
+
+    foreach ($yearMonths as $yearMonth) {
+        // Parse the year and month
+        [$year, $month] = explode('-', $yearMonth);
+        $monthName = date("F", mktime(0, 0, 0, $month, 1));
+        
+        if ($lastYear !== null && $year !== $lastYear) {
+            // If the year changes, finalize the current group with its year
+            $formatted[] = implode(', ', $currentGroup) . " $lastYear";
+            $currentGroup = [];
+        }
+
+        $currentGroup[] = $monthName;
+        $lastYear = $year;
+    }
+
+    // Append the final group
+    if (!empty($currentGroup)) {
+        $formatted[] = implode(', ', $currentGroup) . " $lastYear";
+    }
+
+    return implode(', ', $formatted);
+}
+
 
 ?>

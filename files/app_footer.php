@@ -21,6 +21,7 @@
 
 	<!--plugins-->
 	<script src="<?=baseUri();?>/assets/js/jquery.min.js"></script>
+	<script src="<?=baseUri();?>/assets/js/sumo_select.js"></script>
 	<!--plugins-->
 	<!-- <script src="<?=baseUri();?>/assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script> -->
 	<script src="<?=baseUri();?>/assets/plugins/sweetalert/sweetalert.min.js"></script>

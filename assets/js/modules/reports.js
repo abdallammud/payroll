@@ -74,6 +74,16 @@ document.addEventListener("DOMContentLoaded", function() {
 		    }
 		}
     })
+
+    $('#slcReport').on('change', (e) => {
+    	let report = $(e.target).val();
+    	console.log(report)
+    	if(report == 'attendance') {
+    		$('.slcMonthFilter').removeClass('hidden');
+    	} else {
+    		$('.slcMonthFilter').addClass('hidden');
+    	}
+    })
 });
 
 async function show_report(e) {
@@ -179,21 +189,21 @@ async function show_report(e) {
 		        }},
 
 		        {title: "Paid leave", data: null, render: function(data, type, row) {
-		            return `<div>${row.paid_leave}</div>`;
+		            return `<div>${row.paid_leave_count}</div>`;
 		        }},
 
 		       	{title: "Un-paid leave", data: null, render: function(data, type, row) {
 		            return `<div>
-		            		${row.unpaid_leave}
+		            		${row.unpaid_leave_count}
 		            	</div>`;
 		        }},
 
 		        {title: "Not hired days", data: null, render: function(data, type, row) {
-		            return `<div>${row.not_hired_days}</div>`;
+		            return `<div>${row.not_hired_count}</div>`;
 		        }},
 
 		        {title: "Holidays", data: null, render: function(data, type, row) {
-		            return `<div>${row.holidays}</div>`;
+		            return `<div>${row.holiday_count}</div>`;
 		        }},
 
 			]

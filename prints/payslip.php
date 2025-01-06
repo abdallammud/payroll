@@ -20,11 +20,14 @@ if($query) {
 		$rec = $row;
 		$full_name = $row['full_name'];
 		$emp_id = $row['emp_id'];
+		$month1 = $row['month'];
 		$month = $row['month'];
 		$base_salary = $row['base_salary'];
 		$added_date = $row['added_date'];
 		$month = date('F Y', strtotime($month));
 		$added_date = date('F d, Y', strtotime($added_date));
+
+		$attenInfo = calculateAttendanceStats($emp_id, $month1);
 
 
 
@@ -67,326 +70,329 @@ $pdf->SetAutoPageBreak(TRUE, 15);
 $pdf->AddPage();
 
 $pdf->SetFont('dejavusans', '', 12);
-$pdf->Image('./assets/images/banner.png', 0, 0, 190); // Adjust size as needed
+$pdf->Image('./assets/images/logo.png', 15, 10, 40); // Adjust size as needed
 
-// Set header rectangle
+$y = 40;
 $pdf->SetFillColor(80, 184, 72);
-$pdf->SetDrawColor(80, 184, 72);
-$pdf->Rect(20, 40, 170, 0.2); // Adjusted position and width for landscape
+$pdf->Rect(10, $y, 190, 0.8, "F");
 
-$pdf->SetFont('dejavusans', 'B', 13);
-$pdf->SetXY(15, 45);
-$pdf->Cell(0, 10, strtoupper("Payslip for the month of $month"), 0, 1, 'C');
+$pdf->SetFont('dejavusans', 'B', 20);
+$pdf->SetXY(15, $y-25);
+$pdf->Cell(0, 10, strtoupper("AAH Somalia"), 0, 1, 'C');
 
-$y = $pdf->getY();
+$pdf->SetFont('dejavusans', 'B', 10);
+$pdf->SetXY(15, $y-17);
+$pdf->Cell(0, 10, strtoupper($employee['location_name']), 0, 1, 'C');
+
 $y += 5;
+$pdf->SetFont('dejavusans', 'B', 10);
+$pdf->SetXY(10, $y);
+$pdf->Cell(0, 7, strtoupper("monthly payslip"), "LBRT", 1, 'C');
 
-$pdf->Image('./assets/images/avatars/'.$avatar, 20, $y, 35);
+$y += 7.5;
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(10, $y);
+$pdf->Cell(0, 7, ucwords($month), "LBRT", 1, 'C');
 
-
-$pdf->SetFillColor(255, 255, 255);
-$pdf->SetDrawColor(000, 000, 000);
+$y += 7.5;
+$Y = $y;
+$pdf->Rect(10, $y, 190, 60);
 
 $pdf->SetFont('dejavusans', '', 9);
-$pdf->SetXY(60, $y);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "STAFF ID CODE", "", 1, 'L');
 
-$pdf->Rect(60, $y, 65, 40);
-$pdf->Rect(130, $y, 57, 40);
-
-$pdf->Cell(15, 6, strtoupper("Employee name"), "", 0, '', 0);
-$pdf->SetXY(130, $y);
-$pdf->Cell(15, 6, strtoupper("Payment method"), "", 0, '', 0);
-$pdf->SetFont('dejavusans', 'B', 9);
-
-$y += 4;
-$pdf->SetXY(60, $y);
-$pdf->Cell(65, 6, strtoupper($rec['full_name']), "B", 0, '', 0);
-$pdf->SetXY(130, $y);
-$pdf->Cell(57, 6, strtoupper($emp['payment_bank'] .", ". $emp['payment_account']), "B", 0, '', 0);
-
-$y += 6;
 $pdf->SetFont('dejavusans', '', 9);
-$pdf->SetXY(60, $y);
-$pdf->Cell(65, 6, strtoupper("Employee ID / Staff No."), "", 0, '', 0);
+$pdf->SetXY(55, $y);
+$pdf->Cell(40, 7, strtoupper($employee['staff_no']), "", 1, 'L');
 
-$pdf->SetXY(130, $y);
-$pdf->Cell(65, 6, strtoupper("Days Worked."), "", 0, '', 0);
+$y += 7.5;
 
-$pdf->SetFont('dejavusans', 'B', 9);
-
-$y += 4;
-$pdf->SetXY(60, $y);
-$pdf->Cell(65, 6, strtoupper($rec['emp_id'] .", ". $rec['staff_no']), "B", 0, '', 0);
-
-$pdf->SetXY(130, $y);
-$pdf->Cell(57, 6, strtoupper($rec['days_worked'] ."/". $rec['required_days'] ." days"), "B", 0, '', 0);
-
-$y += 6;
 $pdf->SetFont('dejavusans', '', 9);
-$pdf->SetXY(60, $y);
-$pdf->Cell(65, 6, strtoupper("Job title"), "", 0, '', 0);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "NAME", "", 1, 'L');
 
-$pdf->SetXY(130, $y);
-$pdf->Cell(65, 6, strtoupper("Job Status"), "", 0, '', 0);
-
-$pdf->SetFont('dejavusans', 'B', 9);
-
-$y += 4;
-$pdf->SetXY(60, $y);
-$pdf->Cell(65, 6, strtoupper($emp['position']), "B", 0, '', 0);
-
-$pdf->SetXY(130, $y);
-$pdf->Cell(57, 6, strtoupper($emp['contract_type']), "B", 0, '', 0);
-
-$y += 6;
 $pdf->SetFont('dejavusans', '', 9);
-$pdf->SetXY(60, $y);
-$pdf->Cell(65, 6, strtoupper("Department"), "", 0, '', 0);
+$pdf->SetXY(55, $y);
+$pdf->Cell(40, 7, strtoupper($employee['full_name']), "", 1, 'L');
 
-$pdf->SetXY(130, $y);
-$pdf->Cell(65, 6, strtoupper("Pay date"), "", 0, '', 0);
+$y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "ROLE", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(55, $y);
+$pdf->Cell(40, 7, strtoupper($employee['position']), "", 1, 'L');
+
+$y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "GRADE", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(55, $y);
+$pdf->Cell(40, 7, strtoupper($employee['grade']), "", 1, 'L');
+
+$y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "TAX EXEMPTION", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(55, $y);
+$pdf->Cell(40, 7, strtoupper($employee['tax_exempt']), "", 1, 'L');
+
+$y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "STATE", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(55, $y);
+$pdf->Cell(40, 7, strtoupper($employee['state']), "", 1, 'L');
+
+$y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "DEPARTMENT", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(55, $y);
+$pdf->Cell(40, 7, strtoupper($employee['branch']), "", 1, 'L');
+
+$y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "SENIORITY IN YEARS", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(55, $y);
+$pdf->Cell(40, 7, strtoupper($employee['seniority']), "", 1, 'L');
+
+$y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(130, $Y);
+$pdf->Cell(40, 7, "NO. WORKING DAYS", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(180, $Y);
+$pdf->Cell(40, 7, strtoupper($rec['required_days']), "", 1, 'L');
+
+$Y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(130, $Y);
+$pdf->Cell(40, 7, "NO. MONTHLY HOURS", "", 1, 'L');
+
+$hours = $rec['required_days'] * $employee['work_hours'];
+if(!$hours || !is_numeric($hours)) $hours = 0;
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(180, $Y);
+$pdf->Cell(40, 7, strtoupper($hours), "", 1, 'L');
+
+
+$Y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(130, $Y);
+$pdf->Cell(40, 7, "NO. DAYS WORKED", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(180, $Y);
+$pdf->Cell(40, 7, strtoupper($rec['days_worked']), "", 1, 'L');
+
+$Y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(130, $Y);
+$pdf->Cell(40, 7, "MONTHLY HOURS WORKED", "", 1, 'L');
+
+$worked_hours = $rec['days_worked'] * $employee['work_hours'];
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(180, $Y);
+$pdf->Cell(40, 7, strtoupper($worked_hours), "", 1, 'L');
+
+$Y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(130, $Y);
+$pdf->Cell(40, 7, "ABSENCE DAYS", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(180, $Y);
+$pdf->Cell(40, 7, strtoupper($attenInfo['unpaid_leave_days'] + $attenInfo['paid_leave_days'] + $attenInfo['sick_days'] + $attenInfo['no_show_days']), "", 1, 'L');
+
+$Y += 7.5;
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(130, $Y);
+$pdf->Cell(40, 7, "DAYS NOT HIRED", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(180, $Y);
+$pdf->Cell(40, 7, strtoupper($attenInfo['not_hired_days']), "", 1, 'L');
+
+
+$y += 1;
+$Y = $y;
+$pdf->Rect(10, $y, 190, 150);
+
+$y += 1;
 $pdf->SetFont('dejavusans', 'B', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "Base salary", "", 1, 'L');
 
-$y += 4;
-$pdf->SetXY(60, $y);
-$pdf->Cell(65, 6, strtoupper($emp['branch']), "B", 0, '', 0);
-$pdf->SetXY(130, $y);
-$pdf->Cell(57, 6, strtoupper($added_date), "B", 0, '', 0);
-
-$y += 10;
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(110, $y);
+$pdf->Cell(40, 7, " + ", "", 1, 'L');
 
 $pdf->SetFont('dejavusans', 'B', 9);
-$pdf->SetXY(15, $y);
-$pdf->Cell(0, 10, strtoupper("Payroll details"), 0, 1, 'C');
+$pdf->SetXY(120, $y);
+$pdf->Cell(40, 7, formatMoney($rec['base_salary']), "", 1, 'L');
 
+$gross_salary = $rec['base_salary'];
 
+$allowanceTypes = $GLOBALS['conn']->query("SELECT * FROM `trans_subtypes` WHERE `type` IN ('Allowance', 'Bonus')");
+if($allowanceTypes->num_rows > 0) {
+	while($atRow = $allowanceTypes->fetch_assoc()) {
+		$name = $atRow['name'];
+		$atAmount = 0;
+
+		$get_amount = $GLOBALS['conn']->query("SELECT * FROM `employee_transactions` WHERE `transaction_subtype` = '$name' AND `emp_id` = $emp_id AND `date` LIKE '$month%'");
+		if($get_amount->num_rows > 0) {
+			$atAmount = $get_amount->fetch_assoc()['amount'];
+		}
+
+		$y += 7.5;
+		$pdf->SetFont('dejavusans', '', 9);
+		$pdf->SetXY(13, $y);
+		$pdf->Cell(40, 7, "$name", "", 1, 'L');
+
+		$pdf->SetFont('dejavusans', '', 9);
+		$pdf->SetXY(110, $y);
+		$pdf->Cell(40, 7, " + ", "", 1, 'L');
+
+		$pdf->SetFont('dejavusans', '', 9);
+		$pdf->SetXY(120, $y);
+		$pdf->Cell(40, 7, formatMoney($atAmount), "", 1, 'L');
+
+		$gross_salary += $atAmount;
+	}
+}
+
+$y += 7.5;
 $pdf->SetFillColor(200, 200, 200);
+$pdf->Rect(13, $y-0.7, 186, 8, "F");
 
-$y += 10;
-$pdf->SetXY(20, $y);
-$pdf->Cell(80, 7, strtoupper("EARNINGS"), "LBTR", 0, '', 'F');
-
-$pdf->SetXY(105, $y);
-$pdf->Cell(82, 7, strtoupper("DEDUCTIONS"), "LBTR", 0, '', 'F');
-
-$pdf->SetFillColor(255, 255, 255);
+$pdf->SetFont('dejavusans', 'B', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "Gross salary", "", 1, 'L');
 
 $pdf->SetFont('dejavusans', '', 9);
-$y += 7; $y2 = $y;
-$pdf->SetXY(20, $y);
-$pdf->Cell(40, 7, strtoupper("basic salary"), "LBTR", 0, '', 'F');
+$pdf->SetXY(110, $y);
+$pdf->Cell(40, 7, " = ", "", 1, 'L');
 
-$pdf->SetXY(60, $y);
-$pdf->Cell(40, 7, formatMoney($rec['base_salary']), "LBTR", 0, '', 'F');
+$pdf->SetFont('dejavusans', 'B', 9);
+$pdf->SetXY(120, $y);
+$pdf->Cell(40, 7, formatMoney($gross_salary), "", 1, 'L');
 
-$y += 7;
-$pdf->SetXY(20, $y);
-$pdf->Cell(40, 7, strtoupper("allwance"), "LBTR", 0, '', 'F');
 
-$pdf->SetXY(60, $y);
-$pdf->Cell(40, 7, formatMoney($rec['allowance']), "LBTR", 0, '', 'F');
+$y += 7.5;
+$pdf->SetFillColor(255, 255, 255);
+$pdf->Rect(13, $y-0.7, 186, 8, "F");
 
-$y += 7;
-$pdf->SetXY(20, $y);
-$pdf->Cell(40, 7, strtoupper("comission"), "LBTR", 0, '', 'F');
+$pdf->SetFont('dejavusans', 'B', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "Taxes", "", 1, 'L');
 
-$pdf->SetXY(60, $y);
-$pdf->Cell(40, 7, formatMoney($rec['commission']), "LBTR", 0, '', 'F');
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(110, $y);
+$pdf->Cell(40, 7, " - ", "", 1, 'L');
 
-$y += 7;
-$pdf->SetXY(20, $y);
-$pdf->Cell(40, 7, strtoupper("extra hours"), "LBTR", 0, '', 'F');
+$pdf->SetFont('dejavusans', 'B', 9);
+$pdf->SetXY(120, $y);
+$pdf->Cell(40, 7, formatMoney($rec['tax']), "", 1, 'L');
 
-$pdf->SetXY(60, $y);
-$pdf->Cell(40, 7, formatMoney($rec['extra_hours']), "LBTR", 0, '', 'F');
 
-$y += 7;
-$pdf->SetXY(20, $y);
-$pdf->Cell(40, 7, strtoupper("bonus"), "LBTR", 0, '', 'F');
+$y += 7.5;
+$pdf->SetFillColor(255, 255, 255);
+$pdf->Rect(13, $y-0.7, 186, 8, "F");
 
-$pdf->SetXY(60, $y);
-$pdf->Cell(40, 7, formatMoney($rec['bonus']), "LBTR", 0, '', 'F');
+$pdf->SetFont('dejavusans', 'B', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "Salary advance", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(110, $y);
+$pdf->Cell(40, 7, " - ", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', 'B', 9);
+$pdf->SetXY(120, $y);
+$pdf->Cell(40, 7, formatMoney($rec['advance']), "", 1, 'L');
+
+
+$y += 7.5;
+$pdf->SetFillColor(255, 255, 255);
+$pdf->Rect(13, $y-0.7, 186, 8, "F");
+
+$pdf->SetFont('dejavusans', 'B', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "Total deductions", "", 1, 'L');
+$total_deductions = $rec['advance']+$rec['loan'] + $rec['deductions'] + $rec['unpaid_days'] + $rec['unpaid_hours']+$rec['tax'];
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(110, $y);
+$pdf->Cell(40, 7, " = ", "", 1, 'L');
+
+$pdf->SetFont('dejavusans', 'B', 9);
+$pdf->SetXY(120, $y);
+$pdf->Cell(40, 7, formatMoney($total_deductions), "", 1, 'L');
 
 $total_earnings = $rec['base_salary']+$rec['allowance'] + $rec['bonus'] + $rec['extra_hours'] + $rec['commission'];
 
+$y += 7.5;
+$net_salary = $total_earnings - $total_deductions;
+$pdf->SetFillColor(200, 200, 200);
+$pdf->Rect(13, $y-0.7, 186, 8, "F");
+
 $pdf->SetFont('dejavusans', 'B', 9);
-$y += 7;
-$pdf->SetXY(20, $y);
-$pdf->Cell(40, 7, strtoupper("total earnings"), "LBTR", 0, '', 'F');
-
-$pdf->SetXY(60, $y);
-$pdf->Cell(40, 7, formatMoney($total_earnings), "LBTR", 0, '', 'F');
-
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "Net salary rounded", "", 1, 'L');
 
 $pdf->SetFont('dejavusans', '', 9);
-
-$pdf->SetXY(105, $y2);
-$pdf->Cell(40, 7, strtoupper("UN-PAID DAYS"), "LBTR", 0, '', 'F');
-
-$pdf->SetXY(145, $y2);
-$pdf->Cell(42, 7, formatMoney($rec['unpaid_days']), "LBTR", 0, '', 'F');
-
-$y2 += 7;
-$pdf->SetXY(105, $y2);
-$pdf->Cell(40, 7, strtoupper("UN-PAID hours"), "LBTR", 0, '', 'F');
-
-$pdf->SetXY(145, $y2);
-$pdf->Cell(42, 7, formatMoney($rec['unpaid_hours']), "LBTR", 0, '', 'F');
-
-$y2 += 7;
-$pdf->SetXY(105, $y2);
-$pdf->Cell(40, 7, strtoupper("ADVANCE"), "LBTR", 0, '', 'F');
-
-$pdf->SetXY(145, $y2);
-$pdf->Cell(42, 7, formatMoney($rec['advance']), "LBTR", 0, '', 'F');
-
-$y2 += 7;
-$pdf->SetXY(105, $y2);
-$pdf->Cell(40, 7, strtoupper("Loan"), "LBTR", 0, '', 'F');
-
-$pdf->SetXY(145, $y2);
-$pdf->Cell(42, 7, formatMoney($rec['loan']), "LBTR", 0, '', 'F');
-
-$y2 += 7;
-$pdf->SetXY(105, $y2);
-$pdf->Cell(40, 7, strtoupper("other DEDUCTIONS"), "LBTR", 0, '', 'F');
-
-$pdf->SetXY(145, $y2);
-$pdf->Cell(42, 7, formatMoney($rec['deductions']), "LBTR", 0, '', 'F');
-
-$y2 += 7;
-$pdf->SetXY(105, $y2);
-$pdf->Cell(40, 7, strtoupper("tax"), "LBTR", 0, '', 'F');
-
-$pdf->SetXY(145, $y2);
-$pdf->Cell(42, 7, formatMoney($rec['tax']) .", ($taxPercentage %)", "LBTR", 0, '', 'F');
-
-$total_deductions = $rec['advance']+$rec['loan'] + $rec['deductions'] + $rec['unpaid_days'] + $rec['unpaid_hours']+$rec['tax'];
+$pdf->SetXY(110, $y);
+$pdf->Cell(40, 7, " = ", "", 1, 'L');
 
 $pdf->SetFont('dejavusans', 'B', 9);
-$y2 += 7;
-$pdf->SetXY(105, $y2);
-$pdf->Cell(40, 7, strtoupper("total deductions"), "LBTR", 0, '', 'F');
+$pdf->SetXY(120, $y);
+$pdf->Cell(40, 7, formatMoney($net_salary), "", 1, 'L');
 
-$pdf->SetXY(145, $y2);
-$pdf->Cell(42, 7, formatMoney($total_deductions), "LBTR", 0, '', 'F');
-
-
-$net_salary = $total_earnings - $total_deductions;
-
-$pdf->SetFillColor(220, 220, 220);
-$y2 += 10;
-$pdf->SetXY(105, $y2);
-$pdf->Cell(40, 7, strtoupper("net salary"), "LBTR", 0, '', 'F');
-
-$pdf->SetXY(145, $y2);
-$pdf->Cell(42, 7, formatMoney($net_salary), "LBTR", 0, '', 'F');
-
-$y = $y2;
-
-$pdf->SetFont('dejavusans', '', 9.5);
-$y += 20;
-$pdf->SetXY(20, $y);
-$pdf->MultiCell(169, 5, "I, EMPLOYEE NAME, HEREBY DECLARE THAT I GOT AND AGREED THE NET SALARY MENTIONED
-ABOVE, AND I AM THE EMPLOYEE WHO SIGNED THIS DOCUMENT. ", "", "L");
-
-
-$y += 20; $y2 = $y3 = $y;
-$pdf->Rect(20, $y, 50, 60);
-$pdf->SetFillColor(255, 255, 255);
-
-$pdf->SetFont('dejavusans', 'B', 9.5);
-$pdf->SetXY(20, $y+1);
-$pdf->MultiCell(50, 10, "EMPLOYEE NAME & SIGNATURE", "LBR", "C", 'C', 'F');
-
-$y += 12;
-$pdf->SetXY(20, $y);
-$pdf->MultiCell(50, 7, strtoupper($rec['full_name']), "LBR", "C", 'C', 'F');
-
-$y += 10;
-$pdf->SetXY(20, $y);
-$pdf->MultiCell(50, 7, strtoupper("SIGNATURE"), "LBR", "C", 'C', 'F');
-
-$y += 10;
-$pdf->SetXY(20, $y);
-$pdf->MultiCell(50, 7, strtoupper(''), "LBR", "C", 'C', 'F');
 
 
 $y += 10;
-$pdf->SetXY(20, $y);
-$pdf->MultiCell(50, 7, strtoupper("date"), "LBR", "C", 'C', 'F');
+$pdf->SetFillColor(200, 200, 200);
+$pdf->Rect(13, $y-0.7, 186, 8, "F");
 
+$pdf->SetFont('dejavusans', 'B', 9);
+$pdf->SetXY(13, $y);
+$pdf->Cell(40, 7, "Total to be paid", "", 1, 'L');
 
-$y += 10;
-$pdf->SetXY(20, $y);
-$pdf->MultiCell(50, 7.7, strtoupper("_____/_____/".date('Y')), "LBR", "C", 'C', 'F');
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->SetXY(110, $y);
+$pdf->Cell(40, 7, " = ", "", 1, 'L');
 
-$hrUserInfo = $GLOBALS['userClass']->get($rec['added_by'])['full_name'];
+$pdf->SetFont('dejavusans', 'B', 9);
+$pdf->SetXY(120, $y);
+$pdf->Cell(40, 7, formatMoney($net_salary), "", 1, 'L');
 
-$pdf->Rect(75, $y2, 50, 60);
-$pdf->SetFillColor(255, 255, 255);
-
-$pdf->SetFont('dejavusans', 'B', 10);
-$pdf->SetXY(75, $y2+1);
-$pdf->MultiCell(50, 10, "HRM NAME & SIGNATURE", "LBR", "C", 'C', 'F');
-$pdf->SetFont('dejavusans', 'B', 9.5);
-
-$y2 += 12;
-$pdf->SetXY(75, $y2);
-$pdf->MultiCell(50, 7, strtoupper($hrUserInfo), "LBR", "C", 'C', 'F');
-
-$y2 += 10;
-$pdf->SetXY(75, $y2);
-$pdf->MultiCell(50, 7, strtoupper("SIGNATURE"), "LBR", "C", 'C', 'F');
-
-$y2 += 10;
-$pdf->SetXY(75, $y2);
-$pdf->MultiCell(50, 7, strtoupper(''), "LBR", "C", 'C', 'F');
-
-
-$y2 += 10;
-$pdf->SetXY(75, $y2);
-$pdf->MultiCell(50, 7, strtoupper("date"), "LBR", "C", 'C', 'F');
-
-
-$y2 += 10;
-$pdf->SetXY(75, $y2);
-$pdf->MultiCell(50, 7.7, strtoupper("_____/_____/".date('Y')), "LBR", "C", 'C', 'F');
-
-
-$fnUserInfo = $GLOBALS['userClass']->get($rec['paid_by']);
-if($fnUserInfo) {
-	$fnUserInfo = $fnUserInfo['full_name'];
-}
-
-$pdf->Rect(130, $y3, 50, 60);
-$pdf->SetFillColor(255, 255, 255);
-
-$pdf->SetFont('dejavusans', 'B', 9.5);
-$pdf->SetXY(130, $y3+1);
-$pdf->MultiCell(50, 10, "FINANCER NAME &SIGNATURE", "LBR", "C", 'C', 'F');
-
-$y3 += 12;
-$pdf->SetXY(130, $y3);
-$pdf->MultiCell(50, 7, strtoupper($fnUserInfo), "LBR", "C", 'C', 'F');
-
-$y3 += 10;
-$pdf->SetXY(130, $y3);
-$pdf->MultiCell(50, 7, strtoupper("SIGNATURE"), "LBR", "C", 'C', 'F');
-
-$y3 += 10;
-$pdf->SetXY(130, $y3);
-$pdf->MultiCell(50, 7, strtoupper(''), "LBR", "C", 'C', 'F');
-
-
-$y3 += 10;
-$pdf->SetXY(130, $y3);
-$pdf->MultiCell(50, 7, strtoupper("date"), "LBR", "C", 'C', 'F');
-
-
-$y3 += 10;
-$pdf->SetXY(130, $y3);
-$pdf->MultiCell(50, 7.7, strtoupper("_____/_____/".date('Y')), "LBR", "C", 'C', 'F');
 
 // Output the PDF
 $pdf->Output("Payslip.pdf", 'I');
