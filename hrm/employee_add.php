@@ -26,14 +26,16 @@
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
                                 <label class="label required" for="phone">Phone Number</label>
-                                <input type="text"  class="form-control validate" data-msg="Phone number is required" id="phone" name="phone">
+                                <!-- <input type="text"  class="form-control validate" data-msg="Phone number is required" id="phone" name="phone"> -->
+                                <input type="text"  class="form-control " id="phone" name="phone">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-4">
                             <div class="form-group">
                                 <label class="label required" for="email">Email</label>
-                                <input type="email"  class="form-control validate" id="email" name="email" data-msg="Email is rquired">
+                                <!-- <input type="email"  class="form-control validate" id="email" name="email" data-msg="Email is rquired"> -->
+                                <input type="email"  class="form-control " id="email" name="email">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
@@ -134,7 +136,7 @@
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                        <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
                                 <label class="label required" for="dep"><?=$GLOBALS['branch_keyword']['sing'];?></label>
                                 <select  name="dep" class="form-control validate" data-msg="Please select <?=$GLOBALS['branch_keyword']['sing'];?>" id="dep">
@@ -159,9 +161,10 @@
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                        <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
                                 <label class="label " for="project">Project</label>
+                                <input type="hidden" id="designation" value="" name="">
                                 <select  name="project" class="form-control " id="project">
                                     <option value="">- Select</option>
                                     <?php 
@@ -171,7 +174,7 @@
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                        <!-- <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
                                 <label class="label " for="designation">Designation</label>
                                 <select  name="designation" class="form-control " id="designation">
@@ -182,7 +185,7 @@
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="row">
                         <div class="col col-xs-12 col-md-6 col-lg-2">

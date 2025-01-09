@@ -67,11 +67,25 @@
 
 			<div class="table-responsive">
 				<table id="employeesDT" class="table table-striped table-bordered" style="width:100%">
-					
+					<label class="smt-20 btn btn-secondary edit-table_customize" data-table="employeesDT">
+                        <i class="fa smr-5 fa-pencil"> </i>
+                        Edit table
+                    </label>
 				</table> 
 			</div>
 		</div>
 	</div>
-</div>
+   
+<!-- 
+    employee_id, staff_no, full_name, email, phone_number, contract_type, gender, date_of_birth, state, city, address, branch, location_name, position, project, designation, hire_date, contract_start, contract_end, work_days, work_hours, salary, budget_code, moh_contract, bank, account_number, grade, tax_exempt, seniority, status, action
 
-<?php require('employees_upload.php'); ?>
+    staff_no,full_name,phone_number,position,hire_date,salary,status,action -->
+</div>
+<?php 
+require('employees_upload.php');
+$columns = get_columns('employeesDT', 'show_columns');
+require('./customize_table.php');
+ ?>
+<script type="text/javascript">
+    var tableColumns = <?=json_encode($columns);?>;
+</script>

@@ -21,10 +21,10 @@ $userPermissions = $GLOBALS['userClass']->getPermission_ids($_GET['user_id']);
                 <div id="">
                 	<p class="bold smt-10">User Information</p>
                     <div class="row">
-                        <div class="col col-xs-12 col-md-6 col-lg-4">
+                        <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group relative">
-                                <label class="label required" for="searchEmployee">Search Employee</label>
-                                <input type="text" value="<?=$user['full_name'];?>" readonly=""  class="form-control " id="searchEmployee" name="searchEmployee">
+                                <label class="label required" for="searchEmployee">Full name</label>
+                                <input type="text" value="<?=$user['full_name'];?>"  class="form-control " id="searchEmployee" name="searchEmployee">
                                 <input type="hidden" class="employee_id4CreateUser" value="<?=$user['emp_id'];?>" id="employee_id4CreateUser" name="">
                                 <input type="hidden" class="user_id4Edit" value="<?=$user['user_id'];?>" id="user_id4Edit" name="">
                                 <span class="form-error text-danger">This is error</span>
@@ -33,25 +33,40 @@ $userPermissions = $GLOBALS['userClass']->getPermission_ids($_GET['user_id']);
                                 </div>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-4">
+                        <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
-                                <label class="label required" for="username">Username</label>
-                                <input type="text"  class="form-control " value="<?=$user['username'];?>" id="username" name="username" placeholder="Required">
+                                <label class="label required" for="phone">Phone number</label>
+                                <input type="text" value="<?=$user['phone'];?>"  class="form-control " id="phone" name="phone" placeholder="Required">
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                        <div class="col col-xs-12 col-md-6 col-lg-3">
+                            <div class="form-group">
+                                <label class="label required" for="email">Email</label>
+                                <input type="text" value="<?=$user['email'];?>" class="form-control " id="email" name="email" placeholder="Required">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-2">
+                            <div class="form-group">
+                                <label class="label required" for="username">Username</label>
+                                <input type="hidden" id="systemRole" value="" name="">
+                                <input type="text"  class="form-control " value="<?=$user['username'];?>" id="username" name="username" placeholder="Required">
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                       <!--  <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
                                 <label class="label required" for="systemRole">System Role</label>
                                 <select  class="form-control " id="systemRole" name="systemRole">
                                 	<option value="">- Select</option>
                                 	<option <?php if(trim($user['role']) == 'Admin') echo 'selected="selected"'; ?>  value="Admin">Admin</option>
                                 	<option <?php if(trim($user['role']) == 'User') echo 'selected="selected"'; ?>  value="User">User</option>
-                                	<!-- <option <?php if(trim($user['role']) == 'Employee') echo 'selected="selected"'; ?>  value="Employee">Employee</option> -->
+                                	<option <?php if(trim($user['role']) == 'Employee') echo 'selected="selected"'; ?>  value="Employee">Employee</option> 
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
                                 <label class="label required" for="slcStatus">Status</label>

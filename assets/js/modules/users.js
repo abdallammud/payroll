@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 	})
 
-	$('#searchEmployee').on('keyup', async (e) => {
+	/*$('#searchEmployee').on('keyup', async (e) => {
 		let search = $(e.target).val();
 		let searchFor = 'create-user';
 
@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		        console.error('Error occurred during form submission:', err);
 		    }
 		}
-	})
+	})*/
 
 	// Add user
 	$('#addUserForm').on('submit', (e) => {
@@ -149,7 +149,9 @@ function handleUser4CreateUser(employee_id, full_name) {
 
 async function handle_addUserForm(form) {
 	clearErrors();
-    let employee_id 	= $(form).find('#employee_id4CreateUser').val();
+    let full_name 	= $(form).find('#searchEmployee').val();
+    let phone 		= $(form).find('#phone').val();
+    let email 		= $(form).find('#email').val();
     let username 		= $(form).find('#username').val();
     let password 		= $(form).find('#password').val();
     let systemRole 		= $(form).find('#systemRole').val();
@@ -165,8 +167,7 @@ async function handle_addUserForm(form) {
 
     // Input validation
     let error = false;
-    error = !validateField(employee_id, `Please search and select employee`, 'searchEmployee') || error;
-    
+    error = !validateField(full_name, `Full name is required`, 'full_name') || error;
     error = !validateField(username, `Username is required`, 'username') || error;
     error = !validateField(password, `Password is required`, 'password') || error;
     error = !validateField(systemRole, `Please select user role`, 'systemRole') || error;
@@ -174,7 +175,9 @@ async function handle_addUserForm(form) {
     if (error) return false;
 
     let formData = {
-        employee_id: employee_id,
+        full_name: full_name,
+        phone:phone,
+        email:email,
         username: username,
         password: password,
         systemRole: systemRole,
@@ -208,12 +211,14 @@ async function handle_addUserForm(form) {
 }
 async function handle_editUserForm(form) {
 	clearErrors();
-	let user_id 		= $(form).find('#user_id4Edit').val();
-    let employee_id 	= $(form).find('#employee_id4CreateUser').val();
+	let full_name 	= $(form).find('#searchEmployee').val();
+    let phone 		= $(form).find('#phone').val();
+    let email 		= $(form).find('#email').val();
     let username 		= $(form).find('#username').val();
     let systemRole 		= $(form).find('#systemRole').val();
-    let slcStatus 		= $(form).find('#slcStatus').val();
     let permissions 	= [];
+	let user_id 		= $(form).find('#user_id4Edit').val();
+    let slcStatus 		= $(form).find('#slcStatus').val();
 
     $('.user_permission:checked').each((i, el) => {
     	permissions.push($(el).val());
@@ -225,20 +230,21 @@ async function handle_editUserForm(form) {
 
     // Input validation
     let error = false;
-    error = !validateField(employee_id, `Please search and select employee`, 'searchEmployee') || error;
-    
+    error = !validateField(full_name, `Full name is required`, 'full_name') || error;
     error = !validateField(username, `Username is required`, 'username') || error;
-    error = !validateField(systemRole, `Please select user role`, 'systemRole') || error;
+    // error = !validateField(systemRole, `Please select user role`, 'systemRole') || error;
 
     if (error) return false;
 
     let formData = {
-    	user_id:user_id,
-        employee_id: employee_id,
+        full_name: full_name,
+        phone:phone,
+        email:email,
         username: username,
         systemRole: systemRole,
-        slcStatus: slcStatus,
         permissions: permissions,
+        user_id:user_id,
+        slcStatus:slcStatus
     };
 
     try {

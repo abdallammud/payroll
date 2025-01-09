@@ -12,53 +12,46 @@ if(isset($_GET['action'])) {
 				    $GLOBALS['conn']->begin_transaction();
 
 				    // Prepare data from POST request (escaping input)
-				    $employee_id 	= escapeStr($_POST['employee_id'] ?? null);
+				    $full_name 	= escapeStr($_POST['full_name'] ?? "");
+				    $phone 	= escapeStr($_POST['phone'] ?? "");
+				    $email 	= escapeStr($_POST['email'] ?? "");
 				    $username 		= escapeStr($_POST['username'] ?? null);
 				    $password 		= escapeStr($_POST['password'] ?? null);
 				    $systemRole 	= escapeStr($_POST['systemRole'] ?? null);
 				    $permissions 	= $_POST['permissions'];
 				    $password   	= password_hash($password, PASSWORD_DEFAULT);
 
-				    if($employee_id) {
-				    	$employee = $employeeClass->read($employee_id);
-				    	$branch_id = $employee['branch_id'];
-				    	$full_name = $employee['full_name'];
-				    	$email = $employee['email'];
-				    	$phone_number = $employee['phone_number'];
+				    $employee_id = $branch_id = 0;
+			    	
 
-				    	$data = array(
-					        'full_name' => $full_name,
-					        'phone'   	=> $phone_number,
-					        'email'     => $email,
-					        'emp_id'    => $employee_id,
-					        'branch_id'         => $branch_id,
-					        'username'  	=> $username,
-					        'password'      => $password,
-					        'role'     		=> $systemRole,
-					        'added_by'      => 'admin',
-					    );
+			    	$data = array(
+				        'full_name' => $full_name,
+				        'phone'   	=> $phone,
+				        'email'     => $email,
+				        'emp_id'    => $employee_id,
+				        'branch_id'         => $branch_id,
+				        'username'  	=> $username,
+				        'password'      => $password,
+				        'role'     		=> $systemRole,
+				        'added_by'      => $_SESSION['user_id'],
+				    );
 
-					    $user_id = $userClass->create($data);
-					    // exit();
+				    $user_id = $userClass->create($data);
+				    // exit();
 
-					    if($user_id) {
-					    	foreach ($permissions as $permission) {
-					    		$permissions_data = array('user_id' => $user_id, 'permission_id' => $permission);
-					    		$userPermissionsClass->create($permissions_data);
-					    	}
-					    }
-
-					    $GLOBALS['conn']->commit();
-
-				        // Return success response
-				        $result['msg'] = 'User created successfully';
-				        $result['error'] = false;
-				    } else {
-				        // If user creation failed, roll back the transaction
-				        $GLOBALS['conn']->rollback();
-				        $result['msg'] = 'Something went wrong, please try again';
-				        $result['error'] = true;
+				    if($user_id) {
+				    	foreach ($permissions as $permission) {
+				    		$permissions_data = array('user_id' => $user_id, 'permission_id' => $permission);
+				    		$userPermissionsClass->create($permissions_data);
+				    	}
 				    }
+
+				    $GLOBALS['conn']->commit();
+
+			        // Return success response
+			        $result['msg'] = 'User created successfully';
+			        $result['error'] = false;
+				    
 				} catch (Exception $e) {
 				    // If any exception occurs, rollback the transaction
 				    $GLOBALS['conn']->rollback();
@@ -86,6 +79,9 @@ if(isset($_GET['action'])) {
 				    $GLOBALS['conn']->begin_transaction();
 
 				    // Prepare data from POST request (escaping input)
+				    $full_name 		= escapeStr($_POST['full_name'] ?? "");
+				    $phone 		= escapeStr($_POST['phone'] ?? "");
+				    $email 		= escapeStr($_POST['email'] ?? "");
 				    $user_id 		= escapeStr($_POST['user_id'] ?? null);
 				    $employee_id 	= escapeStr($_POST['employee_id'] ?? null);
 				    $username 		= escapeStr($_POST['username'] ?? null);
@@ -93,49 +89,40 @@ if(isset($_GET['action'])) {
 				    $slcStatus 		= escapeStr($_POST['slcStatus'] ?? 'Active');
 				    $permissions 	= $_POST['permissions'];
 
-				    if($employee_id) {
-				    	$employee = $employeeClass->read($employee_id);
-				    	$branch_id = $employee['branch_id'];
-				    	$full_name = $employee['full_name'];
-				    	$email = $employee['email'];
-				    	$phone_number = $employee['phone_number'];
+			    	
+			    	$employee_id = $branch_id = 0;
 
-				    	$data = array(
-					        'full_name' => $full_name,
-					        'phone'   	=> $phone_number,
-					        'email'     => $email,
-					        'emp_id'    => $employee_id,
-					        'branch_id'     => $branch_id,
-					        'username'  	=> $username,
-					        'role'     		=> $systemRole,
-					        'status'     	=> $slcStatus,
-					        'updated_by'      => 'admin',
-					        'updated_date' => $updated_date,
-					    );
+			    	$data = array(
+				        'full_name' => $full_name,
+				        'phone'   	=> $phone,
+				        'email'     => $email,
+				        'emp_id'    => $employee_id,
+				        'branch_id'     => $branch_id,
+				        'username'  	=> $username,
+				        'role'     		=> $systemRole,
+				        'status'     	=> $slcStatus,
+				        'updated_by'      => $_SESSION['user_id'],
+				        'updated_date' => $updated_date,
+				    );
 
-					    $updateUser = $userClass->update($user_id, $data);
-					    // exit();
+				    $updateUser = $userClass->update($user_id, $data);
+				    // exit();
 
-					    if($updateUser) {
-					    	$sql = "DELETE FROM `user_permissions` WHERE `user_id` = '$user_id'";
-					    	mysqli_query($GLOBALS['conn'], $sql);
-					    	foreach ($permissions as $permission) {
-					    		$permissions_data = array('user_id' => $user_id, 'permission_id' => $permission);
-					    		$userPermissionsClass->create($permissions_data);
-					    	}
-					    }
-
-					    $GLOBALS['conn']->commit();
-
-				        // Return success response
-				        $result['msg'] = 'User updated successfully';
-				        $result['error'] = false;
-				    } else {
-				        // If user creation failed, roll back the transaction
-				        $GLOBALS['conn']->rollback();
-				        $result['msg'] = 'Something went wrong, please try again';
-				        $result['error'] = true;
+				    if($updateUser) {
+				    	$sql = "DELETE FROM `user_permissions` WHERE `user_id` = '$user_id'";
+				    	mysqli_query($GLOBALS['conn'], $sql);
+				    	foreach ($permissions as $permission) {
+				    		$permissions_data = array('user_id' => $user_id, 'permission_id' => $permission);
+				    		$userPermissionsClass->create($permissions_data);
+				    	}
 				    }
+
+				    $GLOBALS['conn']->commit();
+
+			        // Return success response
+			        $result['msg'] = 'User updated successfully';
+			        $result['error'] = false;
+				   
 				} catch (Exception $e) {
 				    // If any exception occurs, rollback the transaction
 				    $GLOBALS['conn']->rollback();
@@ -285,70 +272,9 @@ if(isset($_GET['action'])) {
 
 
 
-		// Get data
-		else if($_GET['action'] == 'get') {
-			if ($_GET['endpoint'] === 'company') {
-				json(get_data('company', array('id' => $_POST['id'])));
-			} else if ($_GET['endpoint'] === 'branch') {
-				json(get_data('branches', array('id' => $_POST['id'])));
-			}
+		
 
-			exit();
-		}
-
-
-		// Delete data
-		else if($_GET['action'] == 'delete') {
-			if ($_GET['endpoint'] === 'company') {
-				try {
-				    // Delete company
-				    $deleted = $companyClass->delete($_POST['id']);
-
-				    // Company deleted
-				    if($deleted) {
-				        $result['msg'] = 'Company record has been  deleted successfully';
-				        $result['error'] = false;
-				    } else {
-				        $result['msg'] = 'Something went wrong, please try again';
-				        $result['error'] = true;
-				    }
-
-				} catch (Exception $e) {
-				    // Catch any exceptions from the create method and return an error message
-				    $result['msg'] = 'Error: Something went wrong';
-				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
-				    $result['error'] = true;
-				}
-
-				// Return the result as a JSON response (for example in an API)
-				echo json_encode($result);
-			} else if ($_GET['endpoint'] === 'branch') {
-				try {
-				    // Delete branchClass
-				    $deleted = $branchClass->delete($_POST['id']);
-
-				    // Company deleted
-				    if($deleted) {
-				        $result['msg'] = $GLOBALS['branch_keyword']['sing'].' record has been  deleted successfully';
-				        $result['error'] = false;
-				    } else {
-				        $result['msg'] = 'Something went wrong, please try again';
-				        $result['error'] = true;
-				    }
-
-				} catch (Exception $e) {
-				    // Catch any exceptions from the create method and return an error message
-				    $result['msg'] = 'Error: Something went wrong';
-				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
-				    $result['error'] = true;
-				}
-
-				// Return the result as a JSON response (for example in an API)
-				echo json_encode($result);
-			}
-
-			exit();
-		}
+		
 	}
 }
 

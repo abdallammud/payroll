@@ -199,57 +199,184 @@ function load_employees(department = '', state = '', location = '', status = '')
 	    	// Add your custom class to the row 
 	    	$(row).addClass('table-row ' +data.status.toLowerCase());
 	    },
+	    "drawCallback": function(settings) {
+	    	$('#employeesDT_wrapper').find('td').css('display', 'none');
+	    	 $('#employeesDT_wrapper').find('th').css('display', 'none')
+	    	 tableColumns.map((column) => {
+	    		$('#employeesDT_wrapper').find('td.'+column).css('display', 'table-cell')
+	    		$('#employeesDT_wrapper').find('th.'+column).css('display', 'table-cell')
+	    	})
+	    },
 	    columns: [
-	    	{ title: `Staff No.`, data: null, render: function(data, type, row) {
+	    	{ title: `Staff No.`, className: "staff_no", data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.staff_no}</span>
 	                </div>`;
 	        }},
 
-	        { title: `Full name`, data: null, render: function(data, type, row) {
+	        { title: `Full name`, className: "full_name", data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.full_name}</span>
 	                </div>`;
 	        }},
 
-	        { title: `Phone Number`, data: null, render: function(data, type, row) {
+	        { title: `Phone Number`, className: "phone_number", data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.phone_number}</span>
 	                </div>`;
 	        }},
 
-	        { title: `Emai`, data: null, render: function(data, type, row) {
+	        { title: `Email`, className: "email", data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.email}</span>
 	                </div>`;
 	        }},
 
-	        { title: `Position`, data: null, render: function(data, type, row) {
+	        { title: `Gender`, className: "gender", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.gender}</span>
+	                </div>`;
+	        }},
+
+	        { title: `DOB`, className: "date_of_birth", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${formatDate(row.date_of_birth)}</span>
+	                </div>`;
+	        }},
+
+	        { title: `State`, className: "state", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.state}</span>
+	                </div>`;
+	        }},
+
+	        { title: `City`, className: "city", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.city}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Address`, className: "address", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.address}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Department`, className: "branch", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.branch}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Duty Location`, className: "location_name", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.location_name}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Position`, className: "position", data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.position}</span>
 	                </div>`;
 	        }},
 
-	       { title: `Hire date`, data: null, render: function(data, type, row) {
+	        { title: `Project`, className: "project", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.project}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Designation`, className: "designation", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.designation}</span>
+	                </div>`;
+	        }},
+
+	       	{ title: `Hire date`, className: "hire_date", data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${formatDate(row.hire_date)}</span>
 	                </div>`;
 	        }},
 
-	        { title: `Salary`, data: null, render: function(data, type, row) {
+	        { title: `Contract start`, className: "contract_start", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${formatDate(row.contract_start)}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Contract end`, className: "contract_end", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${formatDate(row.contract_end)}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Work days`, className: "work_days", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.work_days} days/week</span>
+	                </div>`;
+	        }},
+
+	        { title: `Work hours`, className: "work_hours", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.work_hours} hours/day</span>
+	                </div>`;
+	        }},
+
+	        { title: `Budget code`, className: "budget_code", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.budget_code} hours/day</span>
+	                </div>`;
+	        }},
+
+	        { title: `Salary`, className: "salary", data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${formatMoney(row.salary)}</span>
 	                </div>`;
 	        }},
 
+	        { title: `MoH Contract`, className: "moh_contract", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.moh_contract}</span>
+	                </div>`;
+	        }},
 
-	        { title: `Status`, data: null, render: function(data, type, row) {
+	        { title: `Bank`, className: "bank", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.payment_bank}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Account number`, className: "account_number", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.payment_account}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Grade`, className: "grade", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.grade}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Tax exempt`, className: "tax_exempt", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.tax_exempt}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Seniority`, className: "seniority", data: null, render: function(data, type, row) {
+	            return `<div>
+	            		<span>${row.seniority}</span>
+	                </div>`;
+	        }},
+
+	        { title: `Status`, className: "status", data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.status}</span>
 	                </div>`;
 	        }},
 
-	        { title: "Action", data: null, render: function(data, type, row) {
+	        { title: "Action", className: "action", data: null, render: function(data, type, row) {
 	            return `<div class="sflex scenter-items">
 	            	<a href="${base_url}/employees/show/${row.employee_id}" class="fa smt-5 cursor smr-10 fa-eye"></a>
             		<a href="${base_url}/employees/edit/${row.employee_id}" class="fa  smt-5 cursor smr-10 fa-pencil"></a>

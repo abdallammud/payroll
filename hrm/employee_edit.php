@@ -33,14 +33,16 @@ $employee = $GLOBALS['employeeClass']->read($employee_id);
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
                                 <label class="label required" for="phone">Phone Number</label>
-                                <input type="text" value="<?=$employee['phone_number'];?>"  class="form-control validate" data-msg="Phone number is required" id="phone" name="phone">
+                                <!-- <input type="text" value="<?=$employee['phone_number'];?>"  class="form-control validate" data-msg="Phone number is required" id="phone" name="phone"> -->
+                                <input type="text" value="<?=$employee['phone_number'];?>"  class="form-control " id="phone" name="phone">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
                                 <label class="label required" for="email">Email</label>
-                                <input type="email" value="<?=$employee['email'];?>"  class="form-control validate" id="email" name="email" data-msg="Email is rquired">
+                                <!-- <input type="email" value="<?=$employee['email'];?>"  class="form-control validate" id="email" name="email" data-msg="Email is rquired"> -->
+                                <input type="email" value="<?=$employee['email'];?>"  class="form-control " id="email" name="email">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
@@ -148,7 +150,7 @@ $employee = $GLOBALS['employeeClass']->read($employee_id);
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                        <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
                                 <label class="label required" for="dep"><?=$GLOBALS['branch_keyword']['sing'];?></label>
                                 <select  name="dep" class="form-control validate" data-msg="Please select <?=$GLOBALS['branch_keyword']['sing'];?>" id="dep">
@@ -163,6 +165,7 @@ $employee = $GLOBALS['employeeClass']->read($employee_id);
                         <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
                                 <label class="label required" for="dutyStation">Duty Station/Health facility</label>
+                                <input type="hidden" id="designation" value="" name="">
                                 <select  name="dutyStation" class="form-control validate" id="dutyStation" data-msg="Please select duty station">
                                     <option value="">- Select </option>
                                     <option <?php if($employee['location_id'] == '0') echo 'selected="selected"'; ?> value="All">All</option>
@@ -173,7 +176,7 @@ $employee = $GLOBALS['employeeClass']->read($employee_id);
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                        <!-- <div class="col col-xs-12 col-md-6 col-lg-2">
                             <div class="form-group">
                                 <label class="label " for="designation">Designation</label>
                                 <select  name="designation" class="form-control " id="designation">
@@ -184,8 +187,8 @@ $employee = $GLOBALS['employeeClass']->read($employee_id);
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
-                        </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                        </div> -->
+                        <div class="col col-xs-12 col-md-6 col-lg-3">
                             <div class="form-group">
                                 <label class="label " for="project">Project</label>
                                 <select  name="project" class="form-control " id="project">
