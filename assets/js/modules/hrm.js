@@ -156,6 +156,43 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	load_employees();
 
+	// Delete employee
+	$(document).on('click', '.delete_employee', async (e) => {
+	    let id = $(e.currentTarget).data('recid');
+	    swal({
+	        title: "Are you sure?",
+	        text: `You are going to delete this employee.`,
+	        icon: "warning",
+	        className: 'warning-swal',
+	        buttons: ["Cancel", "Yes, delete"],
+	    }).then(async (confirm) => {
+	        if (confirm) {
+	            let data = { id: id };
+	            try {
+	                let response = await send_hrmPost('delete employee', data);
+	                console.log(response)
+	                if (response) {
+	                    let res = JSON.parse(response);
+	                    if (res.error) {
+	                        toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+	                    } else {
+	                        toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration: 1000 }).then(() => {
+	                            location.reload();
+	                            // load_branches();
+	                        });
+	                        console.log(res);
+	                    }
+	                } else {
+	                    console.log('Failed to edit state.' + response);
+	                }
+
+	            } catch (err) {
+	                console.error('Error occurred during form submission:', err);
+	            }
+	        }
+	    });
+	});
+
 	$('.filter#slcDepartment, .filter#slcState, .filter#slcLocation, .filter#slcStatus').on('change', () => {
 		let department = $('.filter#slcDepartment').val();
 		let state = $('.filter#slcState').val();
@@ -178,7 +215,7 @@ function load_employees(department = '', state = '', location = '', status = '')
 	    "searching": true,  
 	    "info": true,
 	    "columnDefs": [
-	        { "orderable": false, "searchable": false, "targets": [7] }  // Disable search on first and last columns
+	        { "orderable": false, "searchable": false, "targets": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,28] }  // Disable search on first and last columns
 	    ],
 	    "serverMethod": 'post',
 	    "ajax": {
@@ -262,7 +299,7 @@ function load_employees(department = '', state = '', location = '', status = '')
 	                </div>`;
 	        }},
 
-	        { title: `Department`, className: "branch", data: null, render: function(data, type, row) {
+	        { title: `Department`, className: "department", data: null, render: function(data, type, row) {
 	            return `<div>
 	            		<span>${row.branch}</span>
 	                </div>`;
@@ -388,7 +425,6 @@ function load_employees(department = '', state = '', location = '', status = '')
 
 	return false;
 }
-
 
 async function handle_addEmployeeForm(form) {
 	clearErrors();

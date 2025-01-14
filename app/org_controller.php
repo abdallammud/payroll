@@ -82,6 +82,7 @@ if(isset($_GET['action'])) {
 				        'country_id' => isset($post['country']) ? $post['country']: "" ,  
 				        'country_name' => isset($post['countryName']) ? $post['countryName']: "" , 
 				        'tax_grid' => isset($post['tax']) ? json_encode($post['tax']) : "",
+				        'stamp_duty' => isset($post['stampDuty']) ? $post['stampDuty']: 0 , 
 				        'added_by' => $_SESSION['user_id']
 				    );
 
@@ -471,6 +472,7 @@ if(isset($_GET['action'])) {
 				        'country_name' => isset($post['countryName']) ? $post['countryName']: "" , 
 				        'tax_grid' => isset($post['tax']) ? json_encode($post['tax']) : "",
 				        'status' => isset($post['status']) ? $post['status']: "" , 
+				        'stamp_duty' => isset($post['stampDuty']) ? $post['stampDuty']: 0, 
 				        'updated_by' => $_SESSION['user_id'],
 				        'updated_date' => $updated_date
 				    );

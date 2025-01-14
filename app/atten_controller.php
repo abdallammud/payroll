@@ -1168,7 +1168,7 @@ if(isset($_GET['action'])) {
                                     <option '.$ULChecked.' value="UL">Unpaid Leave</option>
                                 	<option '.$HChecked.' value="H">Holiday</option>
                                 	<option '.$NHChecked.' value="NH">Not hired day</option>
-                                	<option '.$NChecked.' value="N">No show / No call</option>
+                                	<option '.$NChecked.' value="N">Absent</option>
                             	</select>
 				                <input type="radio" class="btn-check removeEmp statusBTN" name="statusBTN' . $emp_id . '" id="removeEmp' . $emp_id . '" value="removeEmp" autocomplete="off">
 				                <label title="Remove employee" class="btn removeEmp swidth-40 statusBTNLabel btn-outline-danger" for="removeEmp' . $emp_id . '"><span class="fa fa-trash"></span></label>

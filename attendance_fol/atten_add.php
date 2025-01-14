@@ -68,7 +68,7 @@
                                     <option value="UL">Unpaid Leave</option>
                                 	<option value="H">Holiday</option>
                                 	<option value="NH">Not hired day</option>
-                                	<option value="N">No show / No call</option>
+                                	<option value="N">Absent</option>
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>

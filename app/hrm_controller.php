@@ -578,6 +578,70 @@ if(isset($_GET['action'])) {
 			exit();
 		}
 
+		// Delete data
+		else if($_GET['action'] == 'delete') {
+			if ($_GET['endpoint'] === 'employee') {
+				try {
+				    // Delete company
+				    check_auth('delete_employee');
+				    $post = escapePostData($_POST);
+				    $employeeId = $post['id'];
+
+				    // Delete payroll info
+				    $deleted = "DELETE FROM `payroll_details` WHERE `emp_id` LIKE '$employeeId'";
+					if(!mysqli_query($GLOBALS["conn"], $deleted)) {
+						throw new Exception('Error: ' . mysqli_error($GLOBALS["conn"]));
+					}
+				    // Delete leave info
+				    $deleted = "DELETE FROM `employee_leave` WHERE `emp_id` LIKE '$employeeId'";
+					if(!mysqli_query($GLOBALS["conn"], $deleted)) {
+						throw new Exception('Error: ' . mysqli_error($GLOBALS["conn"]));
+					}
+				    // Delete attendance info
+				    $deleted = "DELETE FROM `atten_details` WHERE `emp_id` LIKE '$employeeId'";
+					if(!mysqli_query($GLOBALS["conn"], $deleted)) {
+						throw new Exception('Error: ' . mysqli_error($GLOBALS["conn"]));
+					}
+				    // Delete timesheet info
+				    $deleted = "DELETE FROM `timesheet_details` WHERE `emp_id` LIKE '$employeeId'";
+					if(!mysqli_query($GLOBALS["conn"], $deleted)) {
+						throw new Exception('Error: ' . mysqli_error($GLOBALS["conn"]));
+					}
+				    // Delete trans info
+				    $deleted = "DELETE FROM `employee_transactions` WHERE `emp_id` LIKE '$employeeId'";
+					if(!mysqli_query($GLOBALS["conn"], $deleted)) {
+						throw new Exception('Error: ' . mysqli_error($GLOBALS["conn"]));
+					}
+
+					// Delete employee
+					$deleted = "DELETE FROM `employees` WHERE `employee_id` LIKE '$employeeId'";
+					if(!mysqli_query($GLOBALS["conn"], $deleted)) {
+						throw new Exception('Error: ' . mysqli_error($GLOBALS["conn"]));
+					}
+
+				    // Company deleted
+				    if($deleted) {
+				        $result['msg'] = 'Employee info has been  deleted successfully';
+				        $result['error'] = false;
+				    } else {
+				        $result['msg'] = 'Something went wrong, please try again';
+				        $result['error'] = true;
+				    }
+
+				} catch (Exception $e) {
+				    // Catch any exceptions from the create method and return an error message
+				    $result['msg'] = 'Error: Something went wrong';
+				    $result['sql_error'] = $e->getMessage(); // Get the error message from the exception
+				    $result['error'] = true;
+				}
+
+				// Return the result as a JSON response (for example in an API)
+				echo json_encode($result);
+			} 
+
+			exit();
+		}
+
 
 	}
 }

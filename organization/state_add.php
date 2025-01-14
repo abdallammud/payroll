@@ -36,7 +36,15 @@
                                 	?>
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
-                                </select>
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col col-xs-12">
+                            <div class="form-group">
+                                <label class="label required" for="stampDuty">Stamp Duty</label>
+                                <input type="text"  class="form-control " id="stampDuty" value="0" name="stampDuty">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>

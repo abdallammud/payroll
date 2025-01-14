@@ -223,7 +223,7 @@ function get_menu_config() {
                         // 'show' => ['file' => 'employee_show', 'auth' => 'view_employees'],
                     ],
                 ],
-                'timesheet' => [
+                /*'timesheet' => [
                     'default' => 'timesheet',
                     'auth' => 'manage_timesheets',
                     'route' => 'timesheet',
@@ -235,7 +235,7 @@ function get_menu_config() {
                     'auth' => 'manage_leaves',
                     'route' => 'leave',
                     'name' => 'Leave Mgt',
-                ],
+                ],*/
             ],
         ],
 

@@ -634,6 +634,7 @@ function handleStates() {
 
 	    	$(modal).find('#state_id').val(id);
 	    	$(modal).find('#stateName').val(res.name);
+	    	$(modal).find('#stampDuty').val(res.stamp_duty);
 	    	$(modal).find('#stateCountry').val(res.country_id) ;
 	    	$(modal).find('#slcStatus').val(res.status);
 	    }
@@ -693,6 +694,7 @@ async function handle_addStateForm(form) {
     let country = $(form).find('#stateCountry').val();
     let countryName = $(form).find('#stateCountry option:selected').text();
     let tax 	= [];
+    let stampDuty 	= $(form).find('#stampDuty').val();
 
     $('.tax-grid-row').each((i, el) => {
 	    let min = parseFloat($(el).find('.min-amount').val()) || 0; 
@@ -712,7 +714,8 @@ async function handle_addStateForm(form) {
         name: name,
         country: country,
         tax: tax,
-        countryName:countryName
+        countryName:countryName,
+        stampDuty:stampDuty
     };
 
     form_loading(form);
@@ -750,6 +753,7 @@ async function handle_editStateForm(form) {
     let country = $(form).find('#stateCountry').val();
     let countryName = $(form).find('#stateCountry option:selected').text();
     let tax 		= [];
+    let stampDuty 	= $(form).find('#stampDuty').val();
     let slcStatus 	= $(form).find('#slcStatus').val();
 
     $('.tax-grid-row').each((i, el) => {
@@ -772,7 +776,8 @@ async function handle_editStateForm(form) {
         status: slcStatus,
         country: country,
         tax: tax,
-        countryName:countryName
+        countryName:countryName,
+        stampDuty:stampDuty
     };
 
     form_loading(form);

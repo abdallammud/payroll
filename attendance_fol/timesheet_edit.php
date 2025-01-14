@@ -56,7 +56,7 @@
 				                                    <option value="UL">Unpaid Leave</option>
 				                                	<option class="H">Holiday</option>
 				                                	<option value="NH">Not hired day</option>
-				                                	<option value="N">No show / No call</option>
+				                                	<option value="N">Absent</option>
                                             	</select>
 								                <input type="radio" class="btn-check removeEmp statusBTN" name="statusBTN' . $emp_id . '" id="removeEmp' . $emp_id . '" value="removeEmp" autocomplete="off">
 								                <label title="Remove employee" class="btn removeEmp swidth-40 statusBTNLabel btn-outline-danger" for="removeEmp' . $emp_id . '"><span class="fa fa-trash"></span></label>

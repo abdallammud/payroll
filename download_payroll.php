@@ -15,9 +15,7 @@ if ($query->num_rows > 0) {
 
     // Add header row as the first entry
     $result['data'][] = [
-        'Staff No.', 'Employee ID', 'Full Name', 'Contract Type', 'Job Title', 'Payroll Month', 
-        'Required Days', 'Days Worked', 'Gross Salary', 'Earnings', 'Deductions', 'Tax', 
-        'Net Salary', 'Status', 'Bank Name', 'Account Number'
+        'Staff No.', 'Status', 'Full Name', 'Designation', 'Duty Station', 'State',  'Contract Type', 'Payroll Month', 'Required Days', 'Days Worked', 'Gross Salary', 'Earnings', 'Deductions', 'Tax', 'Net Salary', 'Bank Name', 'Account Number'
     ];
 
     while ($row = $query->fetch_assoc()) {
@@ -38,6 +36,8 @@ if ($query->num_rows > 0) {
         $bank_number = $row['bank_number'];
         $month = date('F Y', strtotime($month));
 
+
+
         $employee = $GLOBALS['employeeClass']->read($emp_id);
         $state_id = $employee['state_id'];
         $taxPercentage = getTaxPercentage($base_salary, $state_id);
@@ -46,11 +46,14 @@ if ($query->num_rows > 0) {
             $employee['avatar'] = strtolower($employee['gender']) == 'female' ? 'female_avatar.png' : 'male_avatar.png';
         }
 
+        $status = $employee['status'];
+        $designation = $employee['designation'];
+
         $tax = formatMoney($row['tax']) . " (" . $taxPercentage . "%)";
         $data = [
-            $staff_no, $emp_id, $full_name, $contract_type, $job_title, $month, 
+            $staff_no, $status, $full_name, $designation, $employee['location_name'], $employee['state'], $contract_type, $month, 
             $required_days, $days_worked, formatMoney($base_salary), formatMoney($earnings), 
-            formatMoney($total_deductions), $tax, formatMoney($net_salary), $status, 
+            formatMoney($total_deductions), $tax, formatMoney($net_salary), 
             $bank_name, $bank_number
         ];
 

@@ -37,18 +37,25 @@
                                 	?>
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
-                                </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col col-xs-12">
+                        <div class="col col-xs-6">
+                            <div class="form-group">
+                                <label class="label required" for="stampDuty">Stamp duty</label>
+                                <input type="text"  class="form-control validate" data-msg="State name is required" id="stampDuty" name="stampDuty">
+                                <input type="hidden" id="state_id" name="">
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+                        <div class="col col-xs-6">
                             <div class="form-group">
                                 <label class="label required" for="slcStatus">Status</label>
                                 <select  class="form-control " id="slcStatus" name="slcStatus">
-                                	<option value="Active">Active</option>
-                                	<option value="Suspended">Suspended</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Suspended">Suspended</option>
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>

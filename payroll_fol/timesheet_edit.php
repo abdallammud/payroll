@@ -26,10 +26,10 @@
                                     <option value="">- Select</option>
                                     <option value="Allowance">Allowance</option>
                                     <option value="Bonus">Bonus</option>
-                                    <option value="Commission">Commission</option>
-                                    <option value="Advance">Advance</option>
+                                    <!-- <option value="Commission">Commission</option>
+                                    <option value="Advance">Advance</option> -->
                                     <option value="Deduction">Deduction</option>
-                                    <option value="Loan">Loan</option>
+                                    <!-- <option value="Loan">Loan</option> -->
                                 </select>
                                 <span class="form-error text-danger">This is error</span>
                             </div>

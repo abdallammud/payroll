@@ -69,7 +69,7 @@
                                                     <span class="sflex-basis-100">UL = Unpaid Leave</span>
                                                     <span class="sflex-basis-100">H = Holiday</span>
                                                     <span class="sflex-basis-100">NH = Not hired / Not work day</span>
-                                                    <span class="sflex-basis-100">N = No show / No call</span>
+                                                    <span class="sflex-basis-100">N = Absent</span>
                                                 </div>
                                             </div>
                                         </th>

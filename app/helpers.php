@@ -529,37 +529,53 @@ function calculateTimeSheetHours($employeeId, $payrollMonth, $workHoursPerDay = 
 
 
 function getTaxRate(float $amount, int $stateId): float {
-    // Simulating a database fetch for the state record
+    // Fetch state information
     $stateInfo = get_data('states', ['id' => $stateId]);
-    if($stateInfo) {
-        $stateInfo = $stateInfo[0];
-        // Return 0 if state not found or tax grid is empty
-        if (!$stateInfo || empty($stateInfo['tax_grid'])) {
-            return 0;
+    if (!$stateInfo || empty($stateInfo[0]['tax_grid'])) {
+        return 0; // Return 0 if no state or tax grid found
+    }
+
+    $stateInfo = $stateInfo[0];
+    $taxGridJson = $stateInfo['tax_grid'];
+    $stampDutyRate = isset($stateInfo['stamp_duty']) ? (float)$stateInfo['stamp_duty'] : 0;
+
+    // Decode the tax grid JSON
+    $taxGrid = json_decode($taxGridJson, true);
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($taxGrid)) {
+        return 0; // Return 0 if JSON decoding fails
+    }
+
+    // Initialize non-taxable amount
+    $nonTaxableAmount = 0;
+
+    // Iterate through the tax grid
+    foreach ($taxGrid as $taxBracket) {
+        $min = isset($taxBracket['min']) ? (float)$taxBracket['min'] : 0;
+        $max = isset($taxBracket['max']) ? (float)$taxBracket['max'] : PHP_FLOAT_MAX;
+        $rate = isset($taxBracket['rate']) ? (float)$taxBracket['rate'] : 0;
+
+        // Adjust non-taxable amount
+        if ($rate == 0) {
+            $nonTaxableAmount = $max;
         }
 
-        // Decode the tax grid JSON
-        $taxGrid = json_decode($stateInfo['tax_grid'], true);
+        // Check if the amount falls within the current tax bracket
+        if ($amount >= $min && $amount <= $max) {
+            // Calculate the taxable amount and tax
+            $taxableAmount = max(0, $amount - $nonTaxableAmount);
+            $calculatedTax = $taxableAmount * ($rate / 100);
 
-        // Return 0 if JSON decoding fails
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($taxGrid)) {
-            return 0;
-        }
+            // Calculate stamp duty
+            $stampDuty = $calculatedTax * ($stampDutyRate / 100);
 
-        // Calculate the applicable tax rate
-        foreach ($taxGrid as $taxBracket) {
-            $min = isset($taxBracket['min']) ? (float)$taxBracket['min'] : 0;
-            $max = isset($taxBracket['max']) ? (float)$taxBracket['max'] : PHP_FLOAT_MAX;
-            $rate = isset($taxBracket['rate']) ? (float)$taxBracket['rate'] : 0;
-
-            if ($amount >= $min && $amount <= $max) {
-                // Return the calculated tax amount
-                return $amount * ($rate / 100);
-            }
+            // Return the total tax including stamp duty
+            return $calculatedTax + $stampDuty;
         }
     }
-    return 0;
+
+    return 0; // Default to 0 if no applicable tax bracket is found
 }
+
 
 function getTaxPercentage(float $amount, int $stateId): float {
     // Simulating a database fetch for the state record
