@@ -137,7 +137,7 @@ if(isset($_GET['action'])) {
 				                if ($row == 1) continue; // Skip header row
 
 				                // Ensure the row has the correct number of columns
-				                if (count($line) < 28) {
+				                if (count($line) < 27) {
 				                    $result['errors'] .= "Skipping invalid row at line $row: ";
 				                    continue;
 				                }
@@ -145,12 +145,14 @@ if(isset($_GET['action'])) {
 				                list(
 				                    $staff_no, $full_name, $phone_number, $email, $gender,
 				                    $national_id, $date_of_birth, $city, $address,
-				                    $payment_bank, $payment_account, $branch, $position,
+				                    $payment_bank, $payment_account, $branch, 
 				                    $designation, $state, $location, $hire_date,
 				                    $contract_start, $contract_end, $contract_type, $salary,
 				                    $tax_exempt, $budget_code, $moh_contract, $work_days,
 				                    $work_hours, $grade, $seniority
 				                ) = array_map('escapeStr', $line);
+
+				                $position = $designation;
 
 				                // Check for missing required fields
 				                if (!$full_name || !$phone_number || !$gender || !$email || !$branch || !$state || !$hire_date) {
