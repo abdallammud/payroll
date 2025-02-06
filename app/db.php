@@ -16,7 +16,6 @@ if($conn->connect_error) {
 }
 
 
-// Added hrm
 
 
 ?>
