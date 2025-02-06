@@ -5,9 +5,9 @@ $password   = "";
 $db = "asheeri";
 
 $servername = "localhost";
-$username   = "u138037914_payroll";
-$password   = "Hooyomcn94#";
-$db = "u138037914_payroll";
+$username   = "u138037914_gamaas";
+$password   = ";9lZgpiFqxOA";
+$db = "u138037914_gamaas";
 
 $GLOBALS['conn'] = $conn = new mysqli($servername, $username, $password, $db);
 
