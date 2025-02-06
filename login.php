@@ -1,10 +1,11 @@
 <?php require('./files/login_header.php');?>
+<?php require('./asset_config.php');?>
 	<div class="mx-3 mx-lg-0">
 		<div class="card my-5 col-xl-3 col-xxl-3 col-lg-4 col-md-6 col-sm-12 mt-9 mx-auto rounded-4 overflow-hidden p-4" style="margin-top: 120px !important;">
 			<div class="row g-4">
 				<div class="col-lg-12 d-flex">
 					<div class="card-body">
-						<img src="assets/images/action_logo.svg" class="mb-4" width="145" alt="">
+						<img src="assets/images/<?=get_logo_name_from_url();?>" class="mb-4" width="145" alt="">
 						<h4 class="fw-bold">Get Started Now</h4>
 						<p class="mb-0">Enter your credentials to login your account</p>
 
