@@ -1,4 +1,5 @@
 <?php require('./files/app_header.php');?>
+<?php require('./asset_config.php');?>
     <!--start header-->
     <?php require('./files/app_topbar.php');?>
     <!--end top header-->
