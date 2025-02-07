@@ -8,8 +8,19 @@
             <div class="btn-group smr-10">
                 <a href="<?=baseUri();?>/employees/add"  class="btn btn-primary">Add Employee</a>
             </div>
-            
+            <div class="ms-auto d-none d-md-block">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-primary">Actions</button>
+                    <button type="button" class="btn btn-outline-primary split-bg-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"> <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-end">
+                        <a class="dropdown-item cursor  edit-table_customize" data-table="employeesDT"> Edit table columns</a>
+                        <a class="dropdown-item cursor " href="http://localhost/projects/2025/payroll/pdf.php?print=employees" target="_blank"> Download PDF</a>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </div>
     <hr>
     <div class="card">
@@ -67,10 +78,6 @@
 
 			<div class="table-responsive">
 				<table id="employeesDT" class="table table-striped table-bordered" style="width:100%">
-					<label class="smt-20 btn btn-secondary edit-table_customize" data-table="employeesDT">
-                        <i class="fa smr-5 fa-pencil"> </i>
-                        Edit table
-                    </label>
 				</table> 
 			</div>
 		</div>

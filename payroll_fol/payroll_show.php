@@ -23,17 +23,30 @@ $payrollInfo['month'] = explode(",", $payrollInfo['month']);
 		        <h5 class="">Payroll details </h5>
 		        <div class="ms-auto d-sm-flex">
 		        	<div class="btn-group smr-10">
-		                <a id="download_payroll"  class="btn btn-success"> Download Excel</a>
+		                <!-- <a id="download_payroll"  class="btn btn-success"> Download Excel</a> -->
 		            </div>
 
 		            <div class="btn-group smr-10">
 		                <a href="<?=baseUri();?>/payroll"  class="btn btn-secondary"> Back</a>
-		            </div>  
+		            </div> 
+		            <div class="ms-auto d-none d-md-block">
+		                <div class="btn-group">
+		                    <button type="button" class="btn btn-outline-primary">Actions</button>
+		                    <button type="button" class="btn btn-outline-primary split-bg-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"> <span class="visually-hidden">Toggle Dropdown</span>
+		                    </button>
+		                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-end">
+		                        <a class="dropdown-item cursor  edit-table_customize" data-table="showpayrollDT"> Edit table columns</a>
+		                        <a class="dropdown-item cursor  edit-table_customize" data-table="payroll_pdf"> Edit pdf columns</a>
+		                        <a class="dropdown-item cursor " href="http://localhost/projects/2025/payroll/pdf.php?print=payroll&id=<?=$payroll_id;?>" target="_blank"> Download PDF</a>
+		                        <a id="download_payroll"  class="dropdown-item cursor"> Download Excel</a>
+		                    </div>
+		                </div>
+		            </div> 
 		        </div>
 		    </div>
 
 		    <hr>
-		    
+
 			<div class="card">
 				<div class="card-body">
 					<div class="row">
@@ -97,10 +110,6 @@ $payrollInfo['month'] = explode(",", $payrollInfo['month']);
 					</div>
 					<div class="table-responsive">
 						<table id="showpayrollDT" class="table table-striped table-bordered" style="width:100%">
-							<label class="smt-20 btn btn-secondary edit-table_customize" data-table="showpayrollDT">
-								<i class="fa smr-5 fa-pencil"> </i>
-								Edit table
-							</label>
 							
 						</table> 
 					</div>

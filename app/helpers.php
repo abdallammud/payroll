@@ -206,6 +206,20 @@ function settingsArray() {
             'details' => 'Include Overtime in Payroll Calculations', 
             'remarks' => 'required'
         ],
+        'primary_color' => [
+            'type' => 'primary_color',
+            'value' => '#0d6efd', 
+            'section' => 'system', 
+            'details' => 'System primary color', 
+            'remarks' => 'required'
+        ],
+        'secondary_color' => [
+            'type' => 'secondary_color',
+            'value' => '#50b848', 
+            'section' => 'system', 
+            'details' => 'System secondary color', 
+            'remarks' => 'required'
+        ],
 
     );
 

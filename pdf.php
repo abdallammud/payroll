@@ -1,6 +1,6 @@
 <?php 
 
-
+require('./asset_config.php');
 require('./assets/tcpdf/tcpdf.php');
 require('./app/init.php');
 if (!authenticate()) {
@@ -15,9 +15,16 @@ if(isset($_GET['print'])) {
 		require('prints/allEmployees.php');
 	} else if($_GET['print'] == 'attendance') {
 		require('prints/attendance.php');
-	} else if($_GET['print'] == 'customer_transactions') {
-		require('prints/customer_transactions.php');
-	} else if($_GET['print'] == 'booksCheckedout') {
+	} else if($_GET['print'] == 'payroll') {
+		require('prints/payroll_report.php');
+	} 
+
+
+
+
+
+
+	else if($_GET['print'] == 'booksCheckedout') {
 		require('prints/books_checked_out.php');
 	} else if($_GET['print'] == 'overdueBooks') {
 		require('prints/overdue_books.php');
