@@ -136,7 +136,7 @@ foreach ($data as $row) {
         $width = ($col == 'full_name') ? $fullNameWidth : $dynamicWidth;
         $moneyColumns = ['gross_salary', 'net_salary', 'earnings', 'deductions', 'tax'];
         if(in_array($col, $moneyColumns)) {
-        	$pdf->Cell($width, 7, isset($row[$col]) ? formatMoney($row[$col]) : '-', 1, 0, 'L');
+        	$pdf->Cell($width, 7, isset($row[$col]) ? formatMoney($row[$col]) : formatMoney(0), 1, 0, 'L');
         } else {
         	if($col == 'full_name') $row[$col] = ucwords(strtolower($row[$col]));
         	$pdf->Cell($width, 7, isset($row[$col]) ? $row[$col] : '-', 1, 0, 'L');
