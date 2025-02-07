@@ -15,7 +15,7 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-end">
                         <a class="dropdown-item cursor  edit-table_customize" data-table="employeesDT"> Edit table columns</a>
-                        <a class="dropdown-item cursor " href="http://localhost/projects/2025/payroll/pdf.php?print=employees" target="_blank"> Download PDF</a>
+                        <a class="dropdown-item cursor " href="<?=baseUri();?>/pdf.php?print=employees" target="_blank"> Download PDF</a>
                     </div>
                 </div>
             </div>

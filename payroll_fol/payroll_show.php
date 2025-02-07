@@ -37,7 +37,7 @@ $payrollInfo['month'] = explode(",", $payrollInfo['month']);
 		                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-end">
 		                        <a class="dropdown-item cursor  edit-table_customize" data-table="showpayrollDT"> Edit table columns</a>
 		                        <a class="dropdown-item cursor  edit-table_customize" data-table="payroll_pdf"> Edit pdf columns</a>
-		                        <a class="dropdown-item cursor " href="http://localhost/projects/2025/payroll/pdf.php?print=payroll&id=<?=$payroll_id;?>" target="_blank"> Download PDF</a>
+		                        <a class="dropdown-item cursor " href="<?=baseUri();?>/pdf.php?print=payroll&id=<?=$payroll_id;?>" target="_blank"> Download PDF</a>
 		                        <a id="download_payroll"  class="dropdown-item cursor"> Download Excel</a>
 		                    </div>
 		                </div>
