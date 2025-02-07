@@ -79,12 +79,12 @@ $y = 50;
 // Table Header
 $pdf->SetFont('aefurat', 'B', 10);
 $pdf->SetXY(10, $y);
-$pdf->Cell(15, 7, "Staff No.", 1, 0, 'L', true);
-$pdf->Cell(70, 7, "Full name", 1, 0, 'L', true);
-$pdf->Cell(40, 7, "Phone number", 1, 0, 'L', true);
-$pdf->Cell(60, 7, "Email", 1, 0, 'L', true);
-$pdf->Cell(50, 7, "Department", 1, 0, 'L', true);
-$pdf->Cell(42, 7, "Location", 1, 1, 'L', true);
+$pdf->Cell(15, 8, "Staff No.", 1, 0, 'L', true);
+$pdf->Cell(70, 8, "Full name", 1, 0, 'L', true);
+$pdf->Cell(40, 8, "Phone number", 1, 0, 'L', true);
+$pdf->Cell(60, 8, "Email", 1, 0, 'L', true);
+$pdf->Cell(50, 8, "Department", 1, 0, 'L', true);
+$pdf->Cell(42, 8, "Location", 1, 1, 'L', true);
 
 $y += 7;
 

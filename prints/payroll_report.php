@@ -123,7 +123,7 @@ $dynamicWidth = count($remainingColumns) > 0 ? $remainingWidth / count($remainin
 // Table Header
 foreach ($showColumns as $col) {
     $width = ($col == 'full_name') ? $fullNameWidth : $dynamicWidth;
-    $pdf->Cell($width, 7, $allColumns[$col], 1, 0, 'L', 1);
+    $pdf->Cell($width, 8, $allColumns[$col], 1, 0, 'L', 1);
 }
 $pdf->Ln();
 
