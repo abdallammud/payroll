@@ -1,14 +1,12 @@
 <?php
 
 function getSubdomain() {
-    $host = $_SERVER['HTTP_HOST']; // More reliable than SERVER_NAME
-    $parts = explode(".", $host);
+    $host = $_SERVER['HTTP_HOST']; // Example: gamaas.waxfahan.com
+    $domain = 'waxfahan.com'; // Set your main domain
 
-    // Handle cases where domain has more than two levels (e.g., sub.example.co.uk)
-    $numParts = count($parts);
-    
-    if ($numParts >= 3) {
-        return $parts[0]; // First part is the subdomain
+    // Remove the main domain from the host to get the subdomain
+    if (str_ends_with($host, ".$domain")) {
+        return str_replace(".$domain", '', $host);
     }
 
     return null; // No subdomain found
@@ -18,12 +16,12 @@ $subdomain = getSubdomain();
 
 // Define database credentials in an array
 $dbConfig = [
-   /* 'default' => [
+    'default' => [
         'host' => 'localhost',
         'user' => 'root',
         'password' => '',
         'dbname' => 'asheeri'
-    ],*/
+    ],
     'gamaas' => [
         'host' => 'localhost', 
         'user' => 'u138037914_gamaas',
