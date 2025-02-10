@@ -45,6 +45,8 @@ $dbConfig = [
 // Get the database configuration based on the subdomain
 $config = $dbConfig[$subdomain] ?? $dbConfig['default'];
 
+var_dump($config);
+
 $servername = $config["host"];
 $username   = $config["user"];
 $password   = $config["password"];
