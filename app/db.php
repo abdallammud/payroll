@@ -1,24 +1,18 @@
-<?php 
-
-/*$servername = "localhost";
-$username   = "root";
-$password   = "";
-$db = "asheeri";*/
+<?php
 
 function getSubdomain() {
-	// Get the current server name (e.g., "subdomain.example.com")
-	$server_name = $_SERVER['SERVER_NAME'];
+    $host = $_SERVER['HTTP_HOST']; // Example: gamaas.waxfahan.com
+    $domain = 'waxfahan.com'; // Set your main domain
 
-	// Extract the subdomain 
-	$parts = explode(".", $server_name);
-	$subdomain = array_shift($parts); // Remove and return the first element 
+    // Remove the main domain from the host to get the subdomain
+    if (str_ends_with($host, ".$domain")) {
+        return str_replace(".$domain", '', $host);
+    }
 
-	// Sanitize subdomain (optional)
-	return $sanitized_subdomain = preg_replace('/[^a-z0-9\-]/i', '', $subdomain); 
+    return null; // No subdomain found
 }
 
 $subdomain = getSubdomain();
-
 
 // Define database credentials in an array
 $dbConfig = [
@@ -47,19 +41,17 @@ $config = $dbConfig[$subdomain] ?? $dbConfig['default'];
 
 var_dump($config);
 
-$servername = $config["host"];
-$username   = $config["user"];
-$password   = $config["password"];
-$db 		= $config["dbname"];
+// Create a database connection
+$conn = new mysqli($config['host'], $config['user'], $config['password'], $config['dbname']);
 
-$GLOBALS['conn'] = $conn = new mysqli($servername, $username, $password, $db);
-
-if($conn->connect_error) {
-	die("Connection failed: " . $conn->connect_error);
+var_dump($conn);
+// Check for connection errors
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
-
-
+// Store the connection in the global scope (if necessary)
+$GLOBALS['conn'] = $conn;
 
 
 ?>
