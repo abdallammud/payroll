@@ -18,12 +18,12 @@ $subdomain = getSubdomain();
 
 // Define database credentials in an array
 $dbConfig = [
-    'default' => [
+   /* 'default' => [
         'host' => 'localhost',
         'user' => 'root',
         'password' => '',
         'dbname' => 'asheeri'
-    ],
+    ],*/
     'gamaas' => [
         'host' => 'localhost', 
         'user' => 'u138037914_gamaas',
