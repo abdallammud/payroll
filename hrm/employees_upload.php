@@ -15,6 +15,22 @@
                         	<span class="file-selected-name"></span>
                         </label>
                     </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="row mt-3" id="upload_progress" style="display: none;">
+                        <div class="col-12">
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Text -->
+                    <div class="row mt-2" id="upload_progress_text" style="display: none;">
+                        <div class="col-12 text-center">
+                            <small class="text-muted">Starting upload...</small>
+                        </div>
+                    </div>
                 </div>
             </div>
 

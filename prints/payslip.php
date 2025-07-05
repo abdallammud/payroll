@@ -49,7 +49,7 @@ if($query) {
 
 // Create new PDF document
 $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
-
+$companyInfo = get_data('company', ['id' => 1])[0];
 // Set document information
 $pdf->SetCreator(PDF_CREATOR);
 $pdf->SetAuthor('Hawlkar it solutions');
@@ -70,15 +70,16 @@ $pdf->SetAutoPageBreak(TRUE, 15);
 $pdf->AddPage();
 
 $pdf->SetFont('dejavusans', '', 12);
-$pdf->Image('./assets/images/logo.png', 15, 10, 40); // Adjust size as needed
+$pdf->Image('./assets/images/logo.png', 15, 10, 30); // Adjust size as needed
 
 $y = 40;
 $pdf->SetFillColor(80, 184, 72);
 $pdf->Rect(10, $y, 190, 0.8, "F");
 
 $pdf->SetFont('dejavusans', 'B', 20);
-$pdf->SetXY(15, $y-25);
-$pdf->Cell(0, 10, strtoupper("AAH Somalia"), 0, 1, 'C');
+$pdf->SetXY(35, $y-25);
+$company = $companyInfo['name'];
+$pdf->Cell(0, 10, strtoupper($company), 0, 1, 'C');
 
 $pdf->SetFont('dejavusans', 'B', 10);
 $pdf->SetXY(15, $y-17);

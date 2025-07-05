@@ -175,4 +175,27 @@ function formatYearMonths($input) {
 }
 
 
+function hexToRgb($color) {
+    // Check if the input is a valid hex code
+    if (preg_match('/^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/', $color, $matches)) {
+        // Remove '#' if present
+        $hex = ltrim($color, '#');
+
+        // Convert 3-digit hex to 6-digit
+        if (strlen($hex) == 3) {
+            $hex = preg_replace('/(.)/', '$1$1', $hex);
+        }
+
+        // Convert hex to RGB
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+
+        return "rgb($r, $g, $b)";
+    }
+
+    // Return false if the input is not a valid hex code
+    return $color;
+}
+
 ?>

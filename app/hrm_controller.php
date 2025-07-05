@@ -107,10 +107,7 @@ if(isset($_GET['action'])) {
 				echo json_encode($result);
 			} else if($_GET['endpoint'] == 'upload_employees') {
 				try {
-				    // Begin a transaction
-				    $GLOBALS['conn']->begin_transaction();
-
-				    $result = ['error' => false, 'msg' => '', 'errors' => ''];
+				    $result = ['error' => false, 'msg' => '', 'errors' => '', 'progress' => 0, 'total' => 0, 'processed' => 0];
 
 				    check_auth('add_employee'); // Authorization check
 
@@ -121,24 +118,53 @@ if(isset($_GET['action'])) {
 				        $fileType = $_FILES['file']['type'];
 
 				        // Validate file type and size
-				        if ($fileType != 'text/csv' ) { // File size limit: 5MB
-				        	// || $fileSize > 5 * 1024 * 1024
+				        if ($fileType != 'text/csv') {
 				            $result['error'] = true;
-				            $result['msg'] = "Invalid file type or size. Please upload a valid CSV file.";
+				            $result['msg'] = "Invalid file type. Please upload a valid CSV file.";
 				            echo json_encode($result);
 				            exit();
 				        }
 
+				        // First pass: Count total rows for progress tracking
+				        $totalRows = 0;
+				        if (($file = fopen($fileTmpPath, 'r')) !== false) {
+				            while (fgetcsv($file, 1000, ',') !== false) {
+				                $totalRows++;
+				            }
+				            fclose($file);
+				            $totalRows--; // Subtract header row
+				        }
+
+				        $result['total'] = $totalRows;
+
 				        if (($file = fopen($fileTmpPath, 'r')) !== false) {
 				            $row = 0;
+				            $processedCount = 0;
+				            $successCount = 0;
+				            $errorCount = 0;
+				            $batchSize = 50; // Process in batches for better performance
+				            $batchData = [];
+				            
+				            // Prepare entity caches to reduce database queries
+				            $entityCache = [
+				                'branches' => [],
+				                'states' => [],
+				                'locations' => [],
+				                'designations' => [],
+				                'contract_types' => [],
+				                'budget_codes' => []
+				            ];
 
 				            while (($line = fgetcsv($file, 1000, ',')) !== false) {
 				                $row++;
 				                if ($row == 1) continue; // Skip header row
 
+				                $processedCount++;
+
 				                // Ensure the row has the correct number of columns
 				                if (count($line) < 27) {
 				                    $result['errors'] .= "Skipping invalid row at line $row: ";
+				                    $errorCount++;
 				                    continue;
 				                }
 
@@ -155,33 +181,48 @@ if(isset($_GET['action'])) {
 				                $position = $designation;
 
 				                // Check for missing required fields
-				                if (!$full_name || !$phone_number || !$gender || !$email || !$branch || !$state || !$hire_date) {
+				                if (!$full_name) {
 				                    $result['errors'] .= " Missing required fields at line $row.";
+				                    $errorCount++;
 				                    continue;
 				                }
 
-				                $date_of_birth 	= date('Y-m-d', strtotime($date_of_birth));
-				                $hire_date 		= date('Y-m-d', strtotime($hire_date));
-				                $contract_start = date('Y-m-d', strtotime($contract_start));
-				                $contract_end 	= date('Y-m-d', strtotime($contract_end));
-
-				                $check_sql = "SELECT * FROM `employees` WHERE `full_name` = '$full_name' AND `phone_number` = '$phone_number'";
-				                $check_exists = $GLOBALS['conn']->query($check_sql);
-				                if($check_exists->num_rows > 0) {
-				                	$result['errors'] .= " Record already exits at line $row.";
-				                	continue;
+				                // Validate and format dates
+				                try {
+				                    $date_of_birth = date('Y-m-d', strtotime($date_of_birth));
+				                    $hire_date = date('Y-m-d', strtotime($hire_date));
+				                    $contract_start = date('Y-m-d', strtotime($contract_start));
+				                    $contract_end = date('Y-m-d', strtotime($contract_end));
+				                } catch (Exception $dateEx) {
+				                    $result['errors'] .= " Invalid date format at line $row.";
+				                    $errorCount++;
+				                    continue;
 				                }
 
-				                // Process each entity and handle creation or retrieval
-				                $branch_id = checkAndCreateEntity('branches', $branch, $myUserId, $branchClass);
-				                $state_id = checkAndCreateEntity('states', $state, $myUserId, $statesClass);
-				                $location_id = checkAndCreateEntity('locations', $location, $myUserId, $locationsClass);
-				                $designation_id = checkAndCreateEntity('designations', $designation, $myUserId, $designationsClass);
-				                $contract_type_id = checkAndCreateEntity('contract_types', $contract_type, $myUserId, $contractTypesClass);
-				                $budget_code_id = checkAndCreateEntity('budget_codes', $budget_code, $myUserId, $budgetCodesClass);
+				                // Check for duplicate employees using prepared statement for better performance
+				                $check_stmt = $GLOBALS['conn']->prepare("SELECT employee_id FROM employees WHERE full_name = ? AND phone_number = ?");
+				                $check_stmt->bind_param('ss', $full_name, $phone_number);
+				                $check_stmt->execute();
+				                $check_result = $check_stmt->get_result();
+				                
+				                if($check_result->num_rows > 0) {
+				                    $result['errors'] .= " Record already exists at line $row.";
+				                    $errorCount++;
+				                    $check_stmt->close();
+				                    continue;
+				                }
+				                $check_stmt->close();
 
-				                // Prepare employee data
-				                $employeeData = [
+				                // Use cached entities or create new ones
+				                $branch_id = getCachedOrCreateEntity('branches', $branch, $myUserId, $branchClass, $entityCache);
+				                $state_id = getCachedOrCreateEntity('states', $state, $myUserId, $statesClass, $entityCache);
+				                $location_id = getCachedOrCreateEntity('locations', $location, $myUserId, $locationsClass, $entityCache);
+				                $designation_id = getCachedOrCreateEntity('designations', $designation, $myUserId, $designationsClass, $entityCache);
+				                $contract_type_id = getCachedOrCreateEntity('contract_types', $contract_type, $myUserId, $contractTypesClass, $entityCache);
+				                $budget_code_id = getCachedOrCreateEntity('budget_codes', $budget_code, $myUserId, $budgetCodesClass, $entityCache);
+
+				                // Add to batch
+				                $batchData[] = [
 				                    'full_name' => $full_name,
 				                    'phone_number' => $phone_number,
 				                    'email' => $email,
@@ -213,40 +254,50 @@ if(isset($_GET['action'])) {
 				                    'grade' => $grade,
 				                    'tax_exempt' => $tax_exempt,
 				                    'seniority' => $seniority,
+				                    // 'row_number' => $row
 				                ];
 
-				                $result['id'] = $employeeClass->create($employeeData);
+								// var_dump($batchData);
+								// exit;
 
-				                if ($result['id']) {
-				                    // Handle staff number
-				                    if (!isset($staff_no) || $staff_no == return_setting('staff_prefix')) {
-				                        $staff_no = return_setting('staff_prefix') . $result['id'];
-				                        $employeeClass->update($result['id'], ['staff_no' => $staff_no]);
+				                // Process batch when it reaches the batch size
+				                if (count($batchData) >= $batchSize) {
+				                    $batchResult = processBatchEmployees($batchData, $employeeClass, $myUserId);
+				                    $successCount += $batchResult['success'];
+				                    $errorCount += $batchResult['errors'];
+				                    if (!empty($batchResult['error_messages'])) {
+				                        $result['errors'] .= $batchResult['error_messages'];
 				                    }
+				                    $batchData = [];
+				                }
+				            }
 
-				                    // Create user
-				                    $password = password_hash($phone_number, PASSWORD_DEFAULT);
-				                    $userData = [
-				                        'full_name' => $full_name,
-				                        'phone' => $phone_number,
-				                        'email' => $email,
-				                        'emp_id' => $result['id'],
-				                        'branch_id' => $branch_id,
-				                        'username' => usernameFromEmail($email),
-				                        'password' => $password,
-				                        'role' => 'employee',
-				                        'added_by' => $_SESSION['user_id']
-				                    ];
-				                    // $userClass->create($userData);
-				                } else {
-				                    $GLOBALS['conn']->rollback();
-				                    throw new Exception("Failed to create employee at line $row.");
+				            // Process remaining batch
+				            if (!empty($batchData)) {
+				                $batchResult = processBatchEmployees($batchData, $employeeClass, $myUserId);
+				                $successCount += $batchResult['success'];
+				                $errorCount += $batchResult['errors'];
+				                if (!empty($batchResult['error_messages'])) {
+				                    $result['errors'] .= $batchResult['error_messages'];
 				                }
 				            }
 
 				            fclose($file);
-				            $GLOBALS['conn']->commit();
-				            $result['msg'] = "Employees uploaded successfully.";
+				            
+				            $result['processed'] = $processedCount;
+				            $result['success_count'] = $successCount;
+				            $result['error_count'] = $errorCount;
+				            $result['progress'] = 100;
+				            
+				            if ($successCount > 0) {
+				                $result['msg'] = "Upload completed. Successfully processed $successCount employees.";
+				                if ($errorCount > 0) {
+				                    $result['msg'] .= " $errorCount records had errors.";
+				                }
+				            } else {
+				                $result['error'] = true;
+				                $result['msg'] = "No employees were successfully processed.";
+				            }
 				        } else {
 				            throw new Exception("File read error.");
 				        }
@@ -254,7 +305,6 @@ if(isset($_GET['action'])) {
 				        throw new Exception("Please select a file.");
 				    }
 				} catch (Exception $e) {
-				    $GLOBALS['conn']->rollback();
 				    $result['error'] = true;
 				    $result['msg'] = $e->getMessage();
 				    error_log($e->getMessage());
@@ -644,6 +694,78 @@ if(isset($_GET['action'])) {
 
 
 	}
+}
+
+// Helper function for cached entity creation
+function getCachedOrCreateEntity($table, $name, $userId, $classInstance, &$cache) {
+    if (empty($name)) return null;
+    
+    $cacheKey = strtolower(trim($name));
+    
+    // Check cache first
+    if (isset($cache[$table][$cacheKey])) {
+        return $cache[$table][$cacheKey];
+    }
+    
+    // Check database
+    $stmt = $GLOBALS['conn']->prepare("SELECT id FROM `$table` WHERE name = ?");
+    $stmt->bind_param('s', $name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $id = $row['id'];
+        $stmt->close();
+    } else {
+        $stmt->close();
+        // Create new entity
+        $data = ['name' => $name, 'added_by' => $userId];
+        $id = $classInstance->create($data);
+    }
+    
+    // Cache the result
+    $cache[$table][$cacheKey] = $id;
+    return $id;
+}
+
+// Helper function for batch processing employees
+function processBatchEmployees($batchData, $employeeClass, $userId) {
+    $result = ['success' => 0, 'errors' => 0, 'error_messages' => ''];
+    
+    try {
+        $GLOBALS['conn']->begin_transaction();
+        
+        foreach ($batchData as $employeeData) {
+            try {
+                $employeeData['added_by'] = $userId;
+                $empId = $employeeClass->create($employeeData);
+                
+                if ($empId) {
+                    // Handle staff number
+                    if (!isset($employeeData['staff_no']) || $employeeData['staff_no'] == return_setting('staff_prefix')) {
+                        $staff_no = return_setting('staff_prefix') . $empId;
+                        $employeeClass->update($empId, ['staff_no' => $staff_no]);
+                    }
+                    $result['success']++;
+                } else {
+                    $result['errors']++;
+                    $result['error_messages'] .= " Failed to create employee at line {$employeeData['row_number']}.";
+                }
+            } catch (Exception $e) {
+                $result['errors']++;
+                $result['error_messages'] .= " Error at line {$employeeData['row_number']}: " . $e->getMessage();
+            }
+        }
+        
+        $GLOBALS['conn']->commit();
+    } catch (Exception $e) {
+        $GLOBALS['conn']->rollback();
+        $result['errors'] += count($batchData);
+        $result['error_messages'] .= " Batch processing failed: " . $e->getMessage();
+    }
+    
+    return $result;
 }
 
 ?>

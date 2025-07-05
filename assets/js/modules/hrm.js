@@ -694,6 +694,9 @@ async function handle_upload_employeesForm(form) {
 	let fileInput = $(form).find('#upload_employeesInput');
     let file = fileInput[0].files[0];
     let allowedExtensions = ['csv'];
+    let submitBtn = $(form).find('button[type="submit"]');
+    let progressBar = $(form).find('#upload_progress');
+    let progressText = $(form).find('#upload_progress_text');
 
     // Validate file type
     if (!file) {
@@ -710,22 +713,78 @@ async function handle_upload_employeesForm(form) {
     let formData = new FormData();
     formData.append('file', file);
 
+    // Disable submit button and show progress
+    submitBtn.prop('disabled', true).text('Uploading...');
+    progressBar.show().find('.progress-bar').css('width', '0%');
+    progressText.show().text('Starting upload...');
+
     form_loading(form);
     var ajax = new XMLHttpRequest();
+    
+    // Handle upload progress
+    ajax.upload.addEventListener('progress', function(e) {
+        if (e.lengthComputable) {
+            let percentComplete = (e.loaded / e.total) * 100;
+            progressBar.find('.progress-bar').css('width', percentComplete + '%');
+            progressText.text(`Uploading file: ${Math.round(percentComplete)}%`);
+        }
+    });
+    
 	ajax.addEventListener("load", function(event) {
 		console.log(event.target.response)
-		let res = JSON.parse(event.target.response)
-		if(res.error) {
-			toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
-			return false;
-		} else if(res.errors) {
-			swal('Sorry', `${res.errors} \n`, 'error');
-			return false;
-		} else {
-			toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration: 2000 }).then(() => {
-                location.reload();
-            });
+		try {
+			let res = JSON.parse(event.target.response);
+			
+			// Update progress to show processing
+			if (res.total && res.processed !== undefined) {
+				let processPercent = (res.processed / res.total) * 100;
+				progressBar.find('.progress-bar').css('width', processPercent + '%');
+				progressText.text(`Processing employees: ${res.processed}/${res.total} (${Math.round(processPercent)}%)`);
+			}
+			
+			if(res.error) {
+				toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+				return false;
+			} else if(res.errors) {
+				swal('Sorry', `${res.errors} \n`, 'error');
+				return false;
+			} else {
+				// Show completion
+				progressBar.find('.progress-bar').css('width', '100%');
+				progressText.text('Upload completed successfully!');
+				
+				let successMsg = res.msg;
+				if (res.success_count !== undefined) {
+					successMsg += ` (${res.success_count} employees processed successfully`;
+					if (res.error_count > 0) {
+						successMsg += `, ${res.error_count} errors)`;
+					} else {
+						successMsg += ')';
+					}
+				}
+				
+				toaster.success(successMsg, 'Success', { top: '20%', right: '20px', hide: true, duration: 3000 }).then(() => {
+					location.reload();
+				});
+			}
+		} catch (e) {
+			console.error('Error parsing response:', e);
+			toaster.error('An error occurred while processing the upload.', 'Error');
+		} finally {
+			// Re-enable submit button and hide progress
+			submitBtn.prop('disabled', false).text('Upload');
+			setTimeout(() => {
+				progressBar.hide();
+				progressText.hide();
+			}, 2000);
 		}
+	});
+	
+	ajax.addEventListener("error", function() {
+		toaster.error('Upload failed. Please try again.', 'Error');
+		submitBtn.prop('disabled', false).text('Upload');
+		progressBar.hide();
+		progressText.hide();
 	});
 	
 	ajax.open("POST", `${base_url}/app/hrm_controller.php?action=save&endpoint=upload_employees`);

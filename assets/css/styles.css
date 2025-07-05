@@ -20,9 +20,107 @@
 	min-height: 80vh;
 	margin: 20px 0px;
 }
+.page.content.header {
+	min-height: 30px;
+	padding: 25px;
+	border-top: 3px solid #0d6efd;
+}
 
 .info-tooltip {
 	position: relative;
+}
+/*
+ * Assuming your CSS file is in 'css/style.css'
+ * and your fonts are in 'fonts/' relative to the project root.
+ * The path to the font file will be '../fonts/...'
+ */
+
+/* Open Sans Light (300) */
+@font-face {
+    font-family: 'osl';
+    src: url('../fonts/OpenSans-Light.ttf');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap; /* Optional: controls font loading behavior */
+}
+
+@font-face {
+    font-family: 'osli';
+    src: url('../fonts/OpenSans-LightItalic.ttf');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap; /* Optional: controls font loading behavior */
+}
+
+@font-face {
+    font-family: 'osr';
+    src: url('../fonts/OpenSans-Regular.ttf');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap; /* Optional: controls font loading behavior */
+}
+
+@font-face {
+    font-family: 'osi';
+    src: url('../fonts/OpenSans-Italic.ttf');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap; /* Optional: controls font loading behavior */
+}
+
+@font-face {
+    font-family: 'ossb';
+    src: url('../fonts/OpenSans-SemiBold.ttf');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap; /* Optional: controls font loading behavior */
+}
+
+
+@font-face {
+    font-family: 'osb';
+    src: url('../fonts/OpenSans-Bold.ttf');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap; /* Optional: controls font loading behavior */
+}
+
+@font-face {
+    font-family: 'osbi';
+    src: url('../fonts/OpenSans-BoldItalic.ttf');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap; /* Optional: controls font loading behavior */
+}
+
+
+* {
+	font-family: osr, "Noto Sans", sans-serif;
+	font-size: 14px;
+}
+
+.ff-osl {
+	font-family: osl;
+}
+.ff-osli {
+	font-family: osli;
+}
+
+.ff-osb {
+	font-family: osb;
+}
+.ff-osbi {
+	font-family: osbi;
+}
+
+.ff-osr {
+	font-family: osr;
+}
+.ff-osi {
+	font-family: osi;
+}
+.ff-ossb {
+	font-family: ossb;
 }
 
 .info-tooltip .tooltip-div {
@@ -55,9 +153,16 @@
 }
 .close.modal-close {
 	background: transparent;
-    border: 0px;
-    font-size: 2em;
-    color: #d39898;
+	border: 0px;
+	font-size: 13em !important;
+	color: #d39898;
+	display: flex;
+	align-items: center;
+	height: 50px;
+	/* font-size: 20px; */
+}
+.close.modal-close span {
+	font-size: 20px;
 }
 .modal-body {
 	padding-top: 0px;
@@ -76,7 +181,9 @@
 .form-error {
 	display: none;
 }
-
+.form-control {
+    padding: .75rem .75rem;
+}
 
 
 
@@ -220,4 +327,111 @@ table.dataTable a {
 .warning-swal .swal-button:focus {
     outline: none;
     box-shadow: 0 0 0 1px #fff, 0 0 0 3px rgb(255 113 126 / 29%);
+}
+
+.all_reports {
+	padding: 1px 15px;
+}
+a.report {
+	display: flex;
+	align-items: center;
+	transition-duration: 400ms;
+}
+a.report .report-inner {
+	border: 1px solid #eff1f3;
+	display: flex;
+	align-items: center;
+	border-radius: 3px;;
+	flex-basis: 100%;
+	padding-right: 10px;;
+	box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+a.report p {
+	margin: 0px;
+	padding: 0px;;
+	color: var(--bs-heading-color);
+	display: flex;
+	justify-content: space-between;
+	flex-basis: 90%;
+	align-items: center;
+	transition-duration: 400ms;
+}
+[data-bs-theme=dark] body a.report p {
+	color: #dde0e4;
+}
+a.report:hover p, [data-bs-theme=dark] body a.report:hover p {
+	color: #0c5bd1;
+}
+a.report i.icon {
+	flex-basis: 10%;
+	border-right: 1px solid #eff1f3;
+	padding: 10px;;
+	font-size: 30px;;
+}
+
+body.toggled .logo-img{
+	width :100% !important;
+	height: auto !important;
+}
+
+.emp-profile {
+	position: relative;
+}
+img.profile-img {
+	width: 190px !important;
+	height: 190px !important;
+	border-radius: 50%;
+	border: 5px solid;
+	max-width: 190px !important;
+}
+.profile-img-edit {
+	position: absolute;
+	right: 25%;
+	bottom: 20px;
+	width: 30px;
+	height: 30px;
+	background: var(--page-bg);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+	cursor: pointer;
+}
+.profile-img-edit input {
+	display: none;
+}
+
+button.btn.dropdown-toggle:not(.actions){
+	background-color: var(--bs-body-bg);
+	color: var(--bs-body-color);
+	height: 46px;
+	line-height: 35px;
+	border: var(--bs-border-width) solid var(--bs-border-color);
+}
+
+.dropdown.bootstrap-select.my-select {
+	display: block;
+	width: 100% !important;
+}
+
+.page-footer {
+	position: fixed;
+	bottom: 0;;
+}
+
+
+.sidebar-wrapper .sidebar-nav .metismenu a .parent-icon .bi {
+	font-size: 17px;
+	font-weight: bold;
+}
+.sidebar-wrapper .sidebar-nav .metismenu ul a {
+	font-size: 14px;
+}
+.sidebar-wrapper .sidebar-nav .metismenu ul a i {
+	font-size: 13px;
+	margin-right: 10px;
+}
+.sidebar-wrapper .sidebar-nav .metismenu ul {
+	padding-left: 25px;
 }
