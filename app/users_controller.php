@@ -64,6 +64,27 @@ if(isset($_GET['action'])) {
 
 				// Return the result as a JSON response
 				echo json_encode($result);
+			} else if($_GET['endpoint'] == 'role') {
+				try {
+					// Begin a transaction
+					$GLOBALS['conn']->begin_transaction();
+					$post = escapePostData($_POST);
+					$data = array('role' => $post['name']);
+					$rolesClass->create($data);
+					// Commit the transaction if everything is successful
+					$GLOBALS['conn']->commit();
+
+					// Return success response
+					$result['msg'] = 'Role created successfully';
+					$result['error'] = false;
+				} catch (Exception $e) {
+					// Rollback the transaction if an error occurs
+					$GLOBALS['conn']->rollback();
+					$result['msg'] = 'Error creating role: ' . $e->getMessage();
+					$result['error'] = true;
+				}
+
+				echo json_encode($result);
 			}
 			exit();
 		} 
@@ -135,7 +156,27 @@ if(isset($_GET['action'])) {
 
 				// Return the result as a JSON response
 				echo json_encode($result);
-			} 
+			} else if($_GET['endpoint'] == 'role') {
+				try {
+					// Begin a transaction
+					$GLOBALS['conn']->begin_transaction();
+					$post = escapePostData($_POST);
+					$data = array('role' => $post['name']);
+					$rolesClass->update($post['id'], $data);
+					$GLOBALS['conn']->commit();
+
+					// Return success response
+					$result['msg'] = 'Role updated successfully';
+					$result['error'] = false;
+				} catch (Exception $e) {
+					// Rollback the transaction if an error occurs
+					$GLOBALS['conn']->rollback();
+					$result['msg'] = 'Error updating role: ' . $e->getMessage();
+					$result['error'] = true;
+				}
+
+				echo json_encode($result);
+			}
 		}
 
 
@@ -206,14 +247,47 @@ if(isset($_GET['action'])) {
 			    } else {
 			        $result['msg'] = "No records found";
 			    }
-			} 
+			} else if ($_GET['endpoint'] === 'roles') {
+			    // Handle roles data loading for DataTable
+			    $query = "SELECT * FROM `roles` WHERE 1=1";
+
+			    // Add search functionality
+			    if ($searchParam) {
+			        $query .= " AND (`role` LIKE '%" . escapeStr($searchParam) . "%')";
+			    }
+
+			    // Get total records count
+			    $countQuery = "SELECT COUNT(*) as total FROM `roles` WHERE 1=1";
+			    if ($searchParam) {
+			        $countQuery .= " AND (`role` LIKE '%" . escapeStr($searchParam) . "%')";
+			    }
+
+			    $totalRecordsResult = $GLOBALS['conn']->query($countQuery);
+			    $totalRecords = $totalRecordsResult->fetch_assoc()['total'];
+
+			    // Add ordering and pagination
+			    $query .= " ORDER BY `id` DESC";
+			    $query .= " LIMIT $start, $length";
+
+			    $roles = $GLOBALS['conn']->query($query);
+
+			    if ($roles->num_rows > 0) {
+			        while ($row = $roles->fetch_assoc()) {
+			            $result['data'][] = $row;
+			        }
+			        $result['iTotalRecords'] = $totalRecords;
+			        $result['iTotalDisplayRecords'] = $totalRecords;
+			        $result['msg'] = $roles->num_rows . " records were found.";
+			    } else {
+			        $result['msg'] = "No records found";
+			    }
+			}
 
 			echo json_encode($result);
 
 			exit();
 
 		} 
-
 
 
 		// search data
@@ -272,8 +346,28 @@ if(isset($_GET['action'])) {
 
 
 
-		
+		else if($_GET['action'] == 'delete') {
+			if ($_GET['endpoint'] === 'role') {
+				try {
+					// Begin a transaction
+					$GLOBALS['conn']->begin_transaction();
+					$post = escapePostData($_POST);
+					$rolesClass->delete($post['id']);
+					$GLOBALS['conn']->commit();
 
+					// Return success response
+					$result['msg'] = 'Role deleted successfully';
+					$result['error'] = false;
+				} catch (Exception $e) {
+					// Rollback the transaction if an error occurs
+					$GLOBALS['conn']->rollback();
+					$result['msg'] = 'Error deleting role: ' . $e->getMessage();
+					$result['error'] = true;
+				}
+
+				echo json_encode($result);
+			}
+		}
 		
 	}
 }

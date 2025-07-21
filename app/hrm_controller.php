@@ -199,20 +199,15 @@ if(isset($_GET['action'])) {
 				                    continue;
 				                }
 
-				                // Check for duplicate employees using prepared statement for better performance
-				                $check_stmt = $GLOBALS['conn']->prepare("SELECT employee_id FROM employees WHERE full_name = ? AND phone_number = ?");
-				                $check_stmt->bind_param('ss', $full_name, $phone_number);
-				                $check_stmt->execute();
-				                $check_result = $check_stmt->get_result();
-				                
-				                if($check_result->num_rows > 0) {
+								// Check for duplicate employees using prepared statement for better performance
+				                $check_stmt = $GLOBALS['conn']->query("SELECT employee_id FROM employees WHERE full_name = '$full_name' AND phone_number = '$phone_number'");
+				                if($check_stmt && $check_stmt->num_rows > 0) {
 				                    $result['errors'] .= " Record already exists at line $row.";
 				                    $errorCount++;
-				                    $check_stmt->close();
+				                    // $check_stmt->close();
 				                    continue;
 				                }
-				                $check_stmt->close();
-
+				                // $check_stmt->close();
 				                // Use cached entities or create new ones
 				                $branch_id = getCachedOrCreateEntity('branches', $branch, $myUserId, $branchClass, $entityCache);
 				                $state_id = getCachedOrCreateEntity('states', $state, $myUserId, $statesClass, $entityCache);
@@ -311,7 +306,7 @@ if(isset($_GET['action'])) {
 				}
 
 				echo json_encode($result);
-			}
+			} 
 
 			exit();
 		} 

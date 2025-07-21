@@ -51,9 +51,7 @@ class Users extends Model {
         }
 
         return $return;;
-    }
-
-    
+    } 
 }
 
 class Permissios extends Model {
@@ -73,6 +71,12 @@ class UserPermissions extends Model {
 }
 
 
+class Roles extends Model {
+    public function __construct() {
+        parent::__construct('roles');
+    }
+}
+
 
 
 
@@ -81,3 +85,4 @@ class UserPermissions extends Model {
 $GLOBALS['userClass']  = $userClass = new Users();
 $GLOBALS['permissionsClass']  = $permissionsClass = new Permissios();
 $GLOBALS['userPermissionsClass']  = $userPermissionsClass = new UserPermissions();
+$GLOBALS['rolesClass']  = $rolesClass = new Roles();

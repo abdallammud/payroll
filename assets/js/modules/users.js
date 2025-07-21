@@ -79,6 +79,9 @@ function load_users() {
 
 	return false;
 }
+// Global variable for roles DataTable
+let rolesTable;
+
 document.addEventListener("DOMContentLoaded", function() {
 	load_users();
 	$('#checkAll').on('change', (e) => {
@@ -130,35 +133,70 @@ document.addEventListener("DOMContentLoaded", function() {
 		return false
 	})
 
-	// Edit user
-	$('#editUserForm').on('submit', (e) => {
-		handle_editUserForm(e.target);
-		return false
-	})
-	
+    // Edit user
+    $('#editUserForm').on('submit', (e) => {
+        handle_editUserForm(e.target);
+        return false
+    })
 
-});	
+    // Initialize roles table if on roles page
+    if ($('#rolesDT').length) {
+        rolesTable = initRolesTable();
+    }
+
+    $('#addRoleForm').on('submit', (e) => {
+        e.preventDefault();
+        handle_addRoleForm(e.target);
+        return false;
+    });
+
+	// Handle edit role button click
+	$(document).on('click', '.edit-role', function() {
+		const roleId = $(this).data('id');
+		const roleName = $(this).data('name');
+		
+		$('#edit_role_id').val(roleId);
+		$('#edit_roleName').val(roleName);
+		$('#edit_role').modal('show');
+	});
+
+	// Handle delete role button click
+	$(document).on('click', '.delete-role', function() {
+		const roleId = $(this).data('id');
+		const roleName = $(this).data('name');
+		handle_deleteRole(roleId, roleName);
+	});
+
+	// Handle edit role form submission
+	$('#editRoleForm').on('submit', function(e) {
+		e.preventDefault();
+		handle_editRoleForm(this);
+		return false;
+	});
+    
+
+});    
 
 function handleUser4CreateUser(employee_id, full_name) {
-	$('.employee_id4CreateUser').val(employee_id)
-	$('#searchEmployee').val(full_name)
-	$('.search_result.employee').css('display', 'none')
+    $('.employee_id4CreateUser').val(employee_id)
+    $('#searchEmployee').val(full_name)
+    $('.search_result.employee').css('display', 'none')
     $('.search_result.employee').html('')
     return false
 }
 
 async function handle_addUserForm(form) {
-	clearErrors();
-    let full_name 	= $(form).find('#searchEmployee').val();
-    let phone 		= $(form).find('#phone').val();
-    let email 		= $(form).find('#email').val();
-    let username 		= $(form).find('#username').val();
-    let password 		= $(form).find('#password').val();
-    let systemRole 		= $(form).find('#systemRole').val();
-    let permissions 	= [];
+    clearErrors();
+    let full_name  = $(form).find('#searchEmployee').val();
+    let phone      = $(form).find('#phone').val();
+    let email      = $(form).find('#email').val();
+    let username   = $(form).find('#username').val();
+    let password   = $(form).find('#password').val();
+    let systemRole = $(form).find('#systemRole').val();
+    let permissions = [];
 
     $('.user_permission:checked').each((i, el) => {
-    	permissions.push($(el).val());
+        permissions.push($(el).val());
     })
 
     console.log(permissions)
@@ -176,8 +214,8 @@ async function handle_addUserForm(form) {
 
     let formData = {
         full_name: full_name,
-        phone:phone,
-        email:email,
+        phone: phone,
+        email: email,
         username: username,
         password: password,
         systemRole: systemRole,
@@ -191,13 +229,13 @@ async function handle_addUserForm(form) {
         if (response) {
             let res = JSON.parse(response)
             if(res.error) {
-            	toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+                toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
             } else {
-            	toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration:2000 }).then(() => {
-            	}).then((e) => {
-            		window.location = `${base_url}/users`;
-            	});
-            	console.log(res)
+                toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration:2000 }).then(() => {
+                }).then((e) => {
+                    window.location = `${base_url}/users`;
+                });
+                console.log(res)
             }
         } else {
             console.log('Failed to save user.' + response);
@@ -209,19 +247,20 @@ async function handle_addUserForm(form) {
 
     return false
 }
+
 async function handle_editUserForm(form) {
-	clearErrors();
-	let full_name 	= $(form).find('#searchEmployee').val();
-    let phone 		= $(form).find('#phone').val();
-    let email 		= $(form).find('#email').val();
-    let username 		= $(form).find('#username').val();
-    let systemRole 		= $(form).find('#systemRole').val();
-    let permissions 	= [];
-	let user_id 		= $(form).find('#user_id4Edit').val();
-    let slcStatus 		= $(form).find('#slcStatus').val();
+    clearErrors();
+    let full_name  = $(form).find('#searchEmployee').val();
+    let phone      = $(form).find('#phone').val();
+    let email      = $(form).find('#email').val();
+    let username   = $(form).find('#username').val();
+    let systemRole = $(form).find('#systemRole').val();
+    let permissions = [];
+    let user_id    = $(form).find('#user_id4Edit').val();
+    let slcStatus  = $(form).find('#slcStatus').val();
 
     $('.user_permission:checked').each((i, el) => {
-    	permissions.push($(el).val());
+        permissions.push($(el).val());
     })
 
     console.log(permissions)
@@ -238,13 +277,13 @@ async function handle_editUserForm(form) {
 
     let formData = {
         full_name: full_name,
-        phone:phone,
-        email:email,
+        phone: phone,
+        email: email,
         username: username,
         systemRole: systemRole,
         permissions: permissions,
-        user_id:user_id,
-        slcStatus:slcStatus
+        user_id: user_id,
+        slcStatus: slcStatus
     };
 
     try {
@@ -254,13 +293,13 @@ async function handle_editUserForm(form) {
         if (response) {
             let res = JSON.parse(response)
             if(res.error) {
-            	toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+                toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
             } else {
-            	toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration:2000 }).then(() => {
-            	}).then((e) => {
-            		window.location = `${base_url}/users`;
-            	});
-            	console.log(res)
+                toaster.success(res.msg, 'Success', { top: '20%', right: '20px', hide: true, duration:2000 }).then(() => {
+                }).then((e) => {
+                    window.location = `${base_url}/users`;
+                });
+                console.log(res)
             }
         } else {
             console.log('Failed to save user.' + response);
@@ -271,4 +310,157 @@ async function handle_editUserForm(form) {
     }
 
     return false
+}
+
+async function handle_addRoleForm(form) {
+    clearErrors();
+    let roleName = $(form).find('#roleName').val();
+
+    // Input validation
+    let error = false;
+    error = !validateField(roleName, `Role name is required`, 'roleName') || error;
+
+    if (error) return false;
+
+    let formData = {
+        name: roleName,
+    };
+
+    try {
+        let response = await send_userPost('save role', formData);
+        console.log(response)
+
+        if (response) {
+            let res = JSON.parse(response)
+            if(res.error) {
+                toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+            } else {
+                toaster.success(res.msg, 'Success', { top: '30%', right: '20px', hide: true, duration: 5000 });
+                // Reload the roles table
+                if (typeof rolesTable !== 'undefined') {
+                    rolesTable.ajax.reload();
+                }
+                // Reset the form
+                form.reset();
+                // Hide the modal
+                $('#add_role').modal('hide');
+            }
+        }
+    } catch (error) {
+        console.error('Error occurred during form submission:', error);
+        toaster.error('An error occurred while processing your request', 'Error', { top: '30%', right: '20px', hide: true, duration: 5000 });
+    }
+}
+
+// Handle edit role form submission
+async function handle_editRoleForm(form) {
+    clearErrors();
+    let roleId = $(form).find('#edit_role_id').val();
+    let roleName = $(form).find('#edit_roleName').val();
+
+    // Input validation
+    let error = false;
+    error = !validateField(roleName, `Role name is required`, 'edit_roleName') || error;
+
+    if (error) return false;
+
+    let formData = {
+        id: roleId,
+        name: roleName
+    };
+
+    try {
+        let response = await send_userPost('update role', formData);
+
+        if (response) {
+            let res = JSON.parse(response);
+            if (res.error) {
+                toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+            } else {
+                toaster.success(res.msg, 'Success', { top: '30%', right: '20px', hide: true, duration: 5000 });
+                // Reload the roles table
+                if (typeof rolesTable !== 'undefined') {
+                    rolesTable.ajax.reload();
+                }
+                // Hide the modal
+                $('#edit_role').modal('hide');
+            }
+        }
+    } catch (error) {
+        console.error('Error occurred during form submission:', error);
+        toaster.error('An error occurred while processing your request', 'Error', { top: '30%', right: '20px', hide: true, duration: 5000 });
+    }
+}
+
+// Handle delete role
+async function handle_deleteRole(roleId, roleName) {
+    swal({
+        title: 'Are you sure?',
+        text: `You want to delete the role "${roleName}"?`,
+        icon: 'warning',
+        buttons: true,
+        dangerMode: true,
+    }).then(async (willDelete) => { // Added 'async' here for consistency
+        if (willDelete) {
+            try {
+                let response = await send_userPost('delete role', { id: roleId });
+                // console.log(response); // Commented out or remove unless debugging
+
+                // It's good practice to check if response is not empty before parsing
+                if (response) {
+                    let res = JSON.parse(response);
+                    if (res.error) {
+                        toaster.warning(res.msg, 'Sorry', { top: '30%', right: '20px', hide: true, duration: 5000 });
+                    } else {
+                        toaster.success(res.msg, 'Success', { top: '30%', right: '20px', hide: true, duration: 5000 });
+                        // Reload the roles table
+                        if (typeof rolesTable !== 'undefined') {
+                            rolesTable.ajax.reload();
+                        }
+                    }
+                } else {
+                    // Handle cases where the response is empty
+                    toaster.error('Empty response received from the server.', 'Error', { top: '30%', right: '20px', hide: true, duration: 5000 });
+                }
+            } catch (error) {
+                console.error('Error occurred while deleting role:', error);
+                // More specific error message if possible, or keep general
+                toaster.error('An error occurred while processing your request. Please try again.', 'Error', { top: '30%', right: '20px', hide: true, duration: 5000 });
+            }
+        }
+    });
+}
+
+// Initialize roles DataTable
+function initRolesTable() {
+    if ($.fn.DataTable.isDataTable('#rolesDT')) {
+        $('#rolesDT').DataTable().destroy();
+    }
+
+    return $('#rolesDT').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: `${base_url}/app/users_controller.php?action=load&endpoint=roles`,
+            type: 'POST'
+        },
+        columns: [
+            { data: 'role', title: 'Role Name' },
+            { 
+                data: null, 
+                title: 'Actions',
+                orderable: false,
+                render: function(data, type, row) {
+                    return `
+                        <button class="btn btn-sm btn-primary edit-role" data-id="${row.id}" data-name="${row.role}">
+                            <i class="fa fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger delete-role" data-id="${row.id}" data-name="${row.role}">
+                            <i class="fa fa-trash"></i> Delete
+                        </button>
+                    `;
+                }
+            }
+        ]
+    });
 }

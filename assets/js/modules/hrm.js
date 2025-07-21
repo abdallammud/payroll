@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	})
 	
 	
-
+	
 });	
 
 function load_employees(department = '', state = '', location = '', status = '') {
@@ -790,3 +790,4 @@ async function handle_upload_employeesForm(form) {
 	ajax.open("POST", `${base_url}/app/hrm_controller.php?action=save&endpoint=upload_employees`);
 	ajax.send(formData);
 }
+
