@@ -175,10 +175,20 @@ if(isset($_GET['action'])) {
 				    $GLOBALS['conn']->begin_transaction();
 				    $post = escapePostData($_POST);
 
-				    if($post['ref'] = 'All') {
+				    if($post['ref'] == 'All') {
 				    	$post['ref_id'] = '';
 				    	$post['ref_name'] = 'All employees';
 				    }
+
+					// Initialize workflow as an array with the first action
+				    $workflow = [
+				        [
+				            'action' => 'Created by '. $_SESSION['full_name'], 
+				            'date' => date('Y-m-d H:i:s'),
+				            'status' => 'Created',
+							'user_id' => $_SESSION['user_id']
+				        ]
+				    ];
 
 				    $month = date('Y-m');
 				    $data = array(
@@ -186,8 +196,11 @@ if(isset($_GET['action'])) {
 				        'ref_id' 	=> $post['ref_id'], 
 				        'month' 	=> $month,
 				        'ref_name' 	=> $post['ref_name'], 
-				        'added_by' 	=> $_SESSION['user_id']
+						'workflow' 	=> json_encode($workflow),
+						'added_by' 	=> $_SESSION['user_id']
 				    );
+
+					// var_dump($data); exit;
 
 				    check_auth('generate_payroll');
 				    $payroll_id = $payrollClass->create($data);
@@ -399,19 +412,57 @@ if(isset($_GET['action'])) {
 
 				// Return the result as a JSON response (for example in an API)
 				echo json_encode($result);
-			} else if($_GET['endpoint'] == 'approvePayroll') {
+			} else if($_GET['endpoint'] == 'changePayrollStatus') {
 				try {
 					$post = escapePostData($_POST);
-					$status = 'Approved';
+					$status = $post['action'];
 					$payrollId = $post['id']; 
 					$emp_id = isset($post['emp_id']) ? $post['emp_id'] : ''; 
-				   	$data = array(
+					$undo = isset($post['undo']) ? $post['undo'] : ''; 
+
+					// get payroll
+					$payrollInfo = get_data('payroll', ['id' => $payrollId]);
+					
+					// Initialize workflow array
+					$workflow = [];
+					if (!empty($payrollInfo[0]['workflow'])) {
+					    $workflow = json_decode($payrollInfo[0]['workflow'], true);
+					    if (!is_array($workflow)) {
+					        $workflow = [];
+					    }
+					}
+
+					if($undo) {
+						// Remove $undo from workflow
+						$workflow = array_filter($workflow, function($item) use ($undo) {
+						    return $item['status'] != $undo;
+						});
+					}
+					
+					// Add new approval action to workflow
+					$workflow[] = [
+					    'action' => $status.' by '. $_SESSION['full_name'],
+					    'date' => date('Y-m-d H:i:s'),
+						'user_id' => $_SESSION['user_id'],
+					    'status' => $status
+					];
+					   
+					$data = array(
 				        'status' => $status, 
 				        'updated_by' => $_SESSION['user_id'],
-				        'updated_date' => $updated_date
+				        'updated_date' => $updated_date,
+						'workflow' => json_encode($workflow)
 				    );
 
-			    	check_auth('approve_payroll');
+					$auth = 'review_payroll';
+					if($status == 'Approved') {
+						$auth = 'approve_payroll';
+					} else if($status == 'Paid') {
+						$auth = 'pay_payroll';
+					} else if($status == 'Reviewed') {
+						$auth = 'review_payroll';
+					} 
+			    	check_auth($auth);
 
 			    	if(isset($emp_id) && $emp_id) {
 			    		$details = $conn->prepare("UPDATE `payroll_details` SET `status`=? WHERE `payroll_id` = '$payrollId' AND `emp_id` = '$emp_id'");
@@ -427,7 +478,7 @@ if(isset($_GET['action'])) {
 
 				    // If the branch is created successfully, return a success message
 				    if($result['id']) {
-				        $result['msg'] = 'Payroll approved successfully successfully';
+				        $result['msg'] = 'Payroll '.$status.' successfully';
 				        $result['error'] = false;
 				    } else {
 				        $result['msg'] = 'Something went wrong, please try again';
@@ -467,10 +518,34 @@ if(isset($_GET['action'])) {
 
 				    check_auth('pay_payroll');
 
+				    // Get current payroll info and workflow
+				    $payrollInfo = get_data('payroll', ['id' => $payrollId]);
+				    
+				    // Initialize workflow array
+				    $workflow = [];
+				    if (!empty($payrollInfo[0]['workflow'])) {
+				        $workflow = json_decode($payrollInfo[0]['workflow'], true);
+				        if (!is_array($workflow)) {
+				            $workflow = [];
+				        }
+				    }
+				    
+				    // Add payment action to workflow
+				    $workflow[] = [
+				        'action' => 'Paid by '. $_SESSION['full_name'] . ' via ' . $bank_name . ' (' . $account . ')' . ($payroll_detId ? ' (Partial Payment)' : ''),
+				        'date' => date('Y-m-d H:i:s'),
+				        'status' => 'Paid',
+				        'amount' => $net_salary,
+				        'bank' => $bank_name,
+				        'account' => $account,
+						'user_id' => $_SESSION['user_id']
+				    ];
+
 				    $data = array(
 				        'status' => $status, 
 				        'updated_by' => $_SESSION['user_id'],
-				        'updated_date' => $updated_date
+				        'updated_date' => $updated_date,
+				        'workflow' => json_encode($workflow)
 				    );
 
 				    $paid_through = $bank_name . ", " . $account;
@@ -1142,7 +1217,7 @@ if(isset($_GET['action'])) {
 			       $data .= '</select>';
 				} else if($_POST['transFor'] == 'Department') {
 					$data = '<label class="label required" for="searchDepartment">Department</label>
-                        <select class="my-select searchDepartment" name="searchDepartment" id="searchDepartment" data-live-search="true" title="Search and select employee">';
+                        <select class="my-select searchDepartment" name="searchDepartment" id="searchDepartment" data-live-search="true" title="Search and select department">';
                         $query = "SELECT * FROM `branches` WHERE `status` = 'active' ORDER BY `name` ASC LIMIT 10";
                         $branchSet = $GLOBALS['conn']->query($query);
                         if($branchSet->num_rows > 0) {
@@ -1157,7 +1232,7 @@ if(isset($_GET['action'])) {
 			       $data .= '</select>';
 				} else if($_POST['transFor'] == 'Location') {
 					$data = '<label class="label required" for="searchLocation">Location</label>
-                        <select class="my-select searchLocation" name="searchLocation" id="searchLocation" data-live-search="true" title="Search and select employee">';
+                        <select class="my-select searchLocation" name="searchLocation" id="searchLocation" data-live-search="true" title="Search and select location">';
                         $query = "SELECT * FROM `locations` WHERE `status` = 'active' ORDER BY `name` ASC LIMIT 10";
                         $locationSet = $GLOBALS['conn']->query($query);
                         if($locationSet->num_rows > 0) {

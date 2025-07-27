@@ -18,6 +18,8 @@ if(isset($_GET['action'])) {
 				    $username 		= escapeStr($_POST['username'] ?? null);
 				    $password 		= escapeStr($_POST['password'] ?? null);
 				    $systemRole 	= escapeStr($_POST['systemRole'] ?? null);
+					$roleText 		= escapeStr($_POST['roleText'] ?? null);
+					$role 			= escapeStr($_POST['role'] ?? null);
 				    $permissions 	= $_POST['permissions'];
 				    $password   	= password_hash($password, PASSWORD_DEFAULT);
 
@@ -29,10 +31,11 @@ if(isset($_GET['action'])) {
 				        'phone'   	=> $phone,
 				        'email'     => $email,
 				        'emp_id'    => $employee_id,
-				        'branch_id'         => $branch_id,
+				        'branch_id'     => $branch_id,
 				        'username'  	=> $username,
 				        'password'      => $password,
-				        'role'     		=> $systemRole,
+						'role_id'     	=> $role,
+				        'role'     		=> $roleText,
 				        'added_by'      => $_SESSION['user_id'],
 				    );
 
@@ -106,7 +109,8 @@ if(isset($_GET['action'])) {
 				    $user_id 		= escapeStr($_POST['user_id'] ?? null);
 				    $employee_id 	= escapeStr($_POST['employee_id'] ?? null);
 				    $username 		= escapeStr($_POST['username'] ?? null);
-				    $systemRole 	= escapeStr($_POST['systemRole'] ?? null);
+				    $role 			= escapeStr($_POST['role'] ?? null);
+				    $roleText 			= escapeStr($_POST['roleText'] ?? null);
 				    $slcStatus 		= escapeStr($_POST['slcStatus'] ?? 'Active');
 				    $permissions 	= $_POST['permissions'];
 
@@ -120,7 +124,8 @@ if(isset($_GET['action'])) {
 				        'emp_id'    => $employee_id,
 				        'branch_id'     => $branch_id,
 				        'username'  	=> $username,
-				        'role'     		=> $systemRole,
+				        'role_id'     		=> $role,
+						'role'     		=> $roleText,
 				        'status'     	=> $slcStatus,
 				        'updated_by'      => $_SESSION['user_id'],
 				        'updated_date' => $updated_date,

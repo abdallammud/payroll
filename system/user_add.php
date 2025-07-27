@@ -16,7 +16,7 @@
                 <div id="">
                 	<p class="bold smt-10">User Information</p>
                     <div class="row">
-                        <div class="col col-xs-12 col-md-6 col-lg-3">
+                        <div class="col col-xs-12 col-md-6 col-lg-4">
                             <div class="form-group relative">
                                 <label class="label required" for="searchEmployee">Full name</label>
                                 <input type="text"  class="form-control " id="searchEmployee" name="searchEmployee">
@@ -27,28 +27,50 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                        <div class="col col-xs-12 col-md-6 col-lg-4">
                             <div class="form-group">
                                 <label class="label required" for="phone">Phone number</label>
                                 <input type="text"  class="form-control " id="phone" name="phone" placeholder="Required">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-3">
+                        <div class="col col-xs-12 col-md-6 col-lg-4">
                             <div class="form-group">
                                 <label class="label required" for="email">Email</label>
                                 <input type="text"  class="form-control " id="email" name="email" placeholder="Required">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                    </div>
+                    <div class="row">
+                        <div class="col col-xs-12 col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label class="label required" for="role">Role</label>
+                                <select type="text"  class="form-control " id="role" name="role">
+                                	<option value="">- Select</option>
+                                	<?php 
+                                	$query = "SELECT `id`, `role` FROM `roles` ORDER BY `id`";
+                                	$result = $GLOBALS['conn']->query($query);
+                                	if ($result->num_rows > 0) {
+                                	    while ($row = $result->fetch_assoc()) {
+                                	        echo '<option value="'.$row['id'].'">'.htmlspecialchars($row['role']).'</option>';
+                                	    }
+                                	}
+                                        
+                                    ?>
+                                </select>
+                                <span class="form-error text-danger">This is error</span>
+                            </div>
+                        </div>
+
+                        <div class="col col-xs-12 col-md-6 col-lg-4">
                             <div class="form-group">
                                 <label class="label required" for="username">Username</label>
                                 <input type="text"  class="form-control " id="username" name="username" placeholder="Required">
                                 <span class="form-error text-danger">This is error</span>
                             </div>
                         </div>
-                        <div class="col col-xs-12 col-md-6 col-lg-2">
+                        <div class="col col-xs-12 col-md-6 col-lg-4">
                             <div class="form-group">
                                 <label class="label required" for="password">Password</label>
                                 <input type="hidden" id="systemRole" value="Admin" name="">

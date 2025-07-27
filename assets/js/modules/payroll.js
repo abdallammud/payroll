@@ -534,7 +534,7 @@ function load_showPayroll(payroll_id, month) {
 	function set_actions(row) {
 		let actions = `<a title="View payslip" data-recid="${row.id}" data-emp_id="${row.emp_id}" class="fa show_payslip smt-5 cursor smr-10 fa-eye"></a>`;
 		if(row.status == 'Pending') {
-			actions += `<a title="Approve payroll" data-recid="${row.payroll_id}" data-emp_id="${row.emp_id}" class="fa approve_payrollBtn smt-5 cursor smr-10 fa-check"></a>`;
+			actions += `<a title="Approve payroll" data-recid="${row.payroll_id}" data-emp_id="${row.emp_id}" class="fa changeBtn_status smt-5 cursor smr-10 fa-check"></a>`;
 		} else if(row.status == 'Approved') {
 			actions += `<a title="Pay payroll" data-recid="${row.payroll_id}" data-detail_id="${row.id}" class="fa pay_payrollBtn smt-5 cursor smr-10 fa-dollar-sign"></a>`;
 		}
@@ -825,20 +825,22 @@ function handlePayroll() {
 	});
 
 	// Approve payroll
-	$(document).on('click', '.approve_payrollBtn', async (e) => {
+	$(document).on('click', '.changeBtn_status', async (e) => {
 	    let id = $(e.currentTarget).data('recid');
 	    let emp_id = $(e.currentTarget).data('emp_id');
+		let action = $(e.currentTarget).data('action');
+		let undo = $(e.currentTarget).data('undo');
 	    swal({
 	        title: "Are you sure?",
-	        text: `You are going to approve this payroll  record.`,
+	        text: `You are going to change payroll status to ${action}.`,
 	        icon: "warning",
 	        // className: 'warning-swal',
-	        buttons: ["Cancel", "Yes, approve"],
+	        buttons: ["Cancel", "Yes, Change"],
 	    }).then(async (confirm) => {
 	        if (confirm) {
-	            let data = { id: id, emp_id:emp_id };
+	            let data = { id: id, emp_id:emp_id, action: action, undo: undo };
 	            try {
-	                let response = await send_payrollPost('update approvePayroll', data);
+	                let response = await send_payrollPost('update changePayrollStatus', data);
 	                console.log(response)
 	                if (response) {
 	                    let res = JSON.parse(response);
@@ -1055,6 +1057,9 @@ async function handle_generatePayrollForm(form) {
         month:month,
     };
 
+	console.log(formData)
+	// return false;
+
     try {
         let response = await send_payrollPost('save payroll', formData);
         console.log(response)
@@ -1142,7 +1147,7 @@ document.addEventListener("DOMContentLoaded", function() {
     	let formData = {search:search, searchFor:searchFor}
 		if(search) {
 			try {
-		        let response = await send_attendancePost('search location4Select', formData);
+		        let response = await send_payrollPost('search location4Select', formData);
 		        console.log(response)
 		        let res = JSON.parse(response);
 		        if(!res.error) {

@@ -190,6 +190,8 @@ async function handle_addUserForm(form) {
     let full_name  = $(form).find('#searchEmployee').val();
     let phone      = $(form).find('#phone').val();
     let email      = $(form).find('#email').val();
+    let role       = $(form).find('#role').val();
+    let roleText   = $(form).find('#role option:selected').text();
     let username   = $(form).find('#username').val();
     let password   = $(form).find('#password').val();
     let systemRole = $(form).find('#systemRole').val();
@@ -220,6 +222,8 @@ async function handle_addUserForm(form) {
         password: password,
         systemRole: systemRole,
         permissions: permissions,
+        role:role,
+        roleText: roleText,
     };
 
     try {
@@ -258,6 +262,8 @@ async function handle_editUserForm(form) {
     let permissions = [];
     let user_id    = $(form).find('#user_id4Edit').val();
     let slcStatus  = $(form).find('#slcStatus').val();
+    let role       = $(form).find('#role').val();
+    let roleText   = $(form).find('#role option:selected').text();
 
     $('.user_permission:checked').each((i, el) => {
         permissions.push($(el).val());
@@ -283,7 +289,9 @@ async function handle_editUserForm(form) {
         systemRole: systemRole,
         permissions: permissions,
         user_id: user_id,
-        slcStatus: slcStatus
+        slcStatus: slcStatus,
+        role: role,
+        roleText: roleText,
     };
 
     try {
@@ -368,6 +376,8 @@ async function handle_editRoleForm(form) {
         id: roleId,
         name: roleName
     };
+
+    console.log(formData);
 
     try {
         let response = await send_userPost('update role', formData);

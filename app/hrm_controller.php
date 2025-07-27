@@ -589,6 +589,24 @@ if(isset($_GET['action'])) {
 			        $countQuery .= " AND (`full_name` LIKE '%" . escapeStr($searchParam) . "%' OR `phone_number` LIKE '%" . escapeStr($searchParam) . "%' OR `email` LIKE '%" . escapeStr($searchParam) . "%' OR `address` LIKE '%" . escapeStr($searchParam) . "%' OR `designation` LIKE '%" . escapeStr($searchParam) . "%' OR `position` LIKE '%" . escapeStr($searchParam) . "%')";
 			    }
 
+				if($department) {
+			    	$countQuery .= " AND `branch_id` LIKE '$department'";
+			    }
+
+			    if($state) {
+			    	$countQuery .= " AND `state_id` LIKE '$state'";
+			    }
+
+			    if($location) {
+			    	$countQuery .= " AND `location_id` LIKE '$location'";
+			    }
+
+			    if($status) {
+			    	$countQuery .= " AND `status` LIKE '$status'";
+			    } else if (!$searchParam) {
+			    	$countQuery .= " AND `status` LIKE 'Active'";
+			    }
+
 			    // Execute count query
 			    $totalRecordsResult = $GLOBALS['conn']->query($countQuery);
 			    $totalRecords = $totalRecordsResult->fetch_assoc()['total'];

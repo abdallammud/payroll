@@ -2,16 +2,25 @@
 $payroll_id = $_GET['payroll_id'] ?? 0;
 $payrollInfo = get_data('payroll', ['id' => $payroll_id]);
 
+$workflow = $myWorkflowStatus = [];
 if($payrollInfo) {
 	$payrollInfo = $payrollInfo[0];
+	$workflow = json_decode($payrollInfo['workflow'], true);
+	// my workflow == workflow where user_id == $_SESSION['user_id']	
+	foreach ($workflow as $key => $value) {
+		if($value['user_id'] == $_SESSION['user_id']) {
+			$myWorkflow = $value;
+			$myWorkflowStatus[] = $value['status'];
+		}
+	}
 } else {
 	$payrollInfo['month'] = '';
 	$payrollInfo['ref'] = '';
 	$payrollInfo['ref_name'] = '';
 	$payrollInfo['added_date'] = '';
 	$payrollInfo['status'] = '';
-
 }
+// var_dump($myWorkflowStatus);
 
 $payrollInfo['month'] = explode(",", $payrollInfo['month']);
 
@@ -29,7 +38,10 @@ $payrollInfo['month'] = explode(",", $payrollInfo['month']);
 		            <div class="btn-group smr-10">
 		                <a href="<?=baseUri();?>/payroll"  class="btn btn-secondary"> Back</a>
 		            </div>  
+
+					
 		        </div>
+				
 		    </div>
 
 		    <hr>
@@ -82,7 +94,7 @@ $payrollInfo['month'] = explode(",", $payrollInfo['month']);
 							<div class="form-group">
                                 <label class="label required" for="payrollMonth">&nbsp; </label>
 	                            <div class="ms-auto d-sm-flex">
-						            <div class="btn-group " style="width:100%">
+						            <!-- <div class="btn-group " style="width:100%">
 						            	<?php if($payrollInfo['status'] == 'Request') { ?>
 						                	<button  type="button" data-recid="<?=$payroll_id;?>" class="btn btn-primary approve_payrollBtn">Approve payroll</button>
 						                <?php } else if($payrollInfo['status'] == 'Approved') {  ?>
@@ -90,7 +102,44 @@ $payrollInfo['month'] = explode(",", $payrollInfo['month']);
 						                <?php } else { ?>
 						                	<button  type="button" class="btn btn-success ">Paid</button>
 						                <?php } ?>
-						            </div>
+						            </div> -->
+
+									<div class="btn-group" style="width:100%; height: 41px;">
+										<button type="button" style="width:100%" class="btn btn-outline-secondary">Menu</button>
+										<button type="button" class="btn btn-outline-secondary split-bg-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">	<span class="visually-hidden">Toggle Dropdown</span>
+										</button>
+										<div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-end">
+											<?php 
+											if(check_session('review_payroll')) {
+												if(!in_array('Reviewed', $myWorkflowStatus)) {
+													echo '<a class="dropdown-item cursor changeBtn_status" data-action="Reviewed" data-recid="'.$payroll_id.'" >Review payroll</a>';
+												} else if(!in_array('Approved', $myWorkflowStatus) && !in_array('Paid', $myWorkflowStatus)) {
+													echo '<a class="dropdown-item cursor changeBtn_status" data-action="Request" 
+													data-undo="Reviewed"
+													data-recid="'.$payroll_id.'" >Undo review</a>';
+												}
+											}
+											if(check_session('approve_payroll')) {
+												if(!in_array('Approved', $myWorkflowStatus)) {
+													echo '<a class="dropdown-item cursor changeBtn_status" data-action="Approved" data-recid="'.$payroll_id.'" >Approve payroll</a>';
+												} else if(!in_array('Paid', $myWorkflowStatus)) {
+													echo '<a class="dropdown-item cursor changeBtn_status" data-action="Reviewed"
+													data-undo="Approved"
+													data-recid="'.$payroll_id.'" >Undo approval</a>';
+												}
+											}
+											if(check_session('pay_payroll')) {
+												if(!in_array('Paid', $myWorkflowStatus)) {
+													echo '<a class="dropdown-item cursor changeBtn_status" data-action="Paid" data-recid="'.$payroll_id.'" >Pay payroll</a>';
+												} else  {
+													echo '<a class="dropdown-item cursor changeBtn_status" data-action="Approved"
+													data-undo="Paid"
+													data-recid="'.$payroll_id.'" >Undo payment</a>';
+												}
+											}
+											?>
+										</div>
+									</div>
 						        </div>
                             </div>
 						</div>
@@ -100,6 +149,10 @@ $payrollInfo['month'] = explode(",", $payrollInfo['month']);
 							<label class="smt-20 btn btn-secondary edit-table_customize" data-table="showpayrollDT">
 								<i class="fa smr-5 fa-pencil"> </i>
 								Edit table
+							</label>
+
+							<label class="smt-20 sml-10 btn btn-primary" data-bs-toggle="modal" data-bs-target="#workflowModal">
+								View Workflow
 							</label>
 							
 						</table> 
@@ -142,7 +195,49 @@ require('./customize_table.php');
 		display: block;
 		width: 100% !important;
 	}
+	button.btn.dropdown-toggle:not(.actions) {
+		height:auto;
+		line-height: 1.5;
+		border: 1px solid var(--bs-body-color);
+	}
 </style>
+
+<!-- Workflow modal -->
+<div class="modal fade" id="workflowModal" tabindex="-1" aria-labelledby="workflowModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width:700px; width: 50vw; max-width: 1200px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="workflowModalLabel">Workflow</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="workflowData">
+					<table class="table table-striped table-bordered smt-10">
+						<thead>
+							<tr>
+								<th style="width: 70%">Action</th>
+								<th style="width: 30%">Date</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php 
+							if(isset($workflow) && !empty($workflow)) {
+								foreach ($workflow as $workflowRow ) {
+									// Show action and date only
+									echo '<tr><td>'.$workflowRow['action'].'</td><td>'.date('F d, Y h:i A', strtotime($workflowRow['date'])).'</td></tr>';
+								}
+							}
+							?>
+						</tbody>
+					</table>
+				</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php 
 require('payslip_show.php');
